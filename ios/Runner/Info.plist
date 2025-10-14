@@ -38,6 +38,8 @@
 	<string>Allow App to access the location to show the jobs present in your area</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Allow app to use photo library to update profile pic using gallery</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>We need microphone access to record voice messages for chat</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

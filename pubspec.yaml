@@ -68,6 +68,9 @@ dependencies:
   file_picker:
   flutter_native_image_v2:
   audioplayers:
+  record: ^5.1.1
+  audio_waveforms: ^1.0.5
+  path: ^1.9.0
   qr_flutter:
   timeago:
   blur:
@@ -83,6 +86,9 @@ dependencies:
   firebase_messaging:
   cloud_firestore:
 
+
+dependency_overrides:
+  record_linux: ^1.0.0
 
 dev_dependencies:
   flutter_test:

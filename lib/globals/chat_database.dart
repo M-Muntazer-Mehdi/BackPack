@@ -55,6 +55,21 @@ class FireDatabase {
   static Future<bool> addMessage(String docId, ChatModel chat) async {
     try {
       log(chat.to.toString());
+      
+      // Determine display message for chat list
+      String displayMessage = chat.message;
+      if (chat.messageType.name == 'voice') {
+        displayMessage = '🎤 Voice message';
+      } else if (chat.messageType.name == 'video') {
+        displayMessage = '🎥 Video';
+      } else if (chat.messageType.name == 'document') {
+        displayMessage = '📄 ${chat.message}';
+      } else if (chat.messageType.name == 'location') {
+        displayMessage = '📍 Location';
+      } else if (chat.files.isNotEmpty && chat.message.isEmpty) {
+        displayMessage = '📷 Photo';
+      }
+
       await _firestore
           .collection('chats')
           .doc(docId)
@@ -62,16 +77,16 @@ class FireDatabase {
           .add({
         "from": Get.find<UserDetail>().userId,
         "to": chat.to,
-        "message": chat.files.isNotEmpty && chat.message.isEmpty
-            ? "Attachment"
-            : chat.message,
+        "message": chat.message,
         "files": chat.files,
         "timestamp": chat.timeStamp,
+        "messageType": chat.messageType.name,
+        "voiceData": chat.voiceData,
       });
       await _firestore.collection('chats').doc(docId).update({
         'lastMessageBy': Get.find<UserDetail>().userId,
         'unreadCount': FieldValue.increment(1),
-        'lastMessage': chat.message,
+        'lastMessage': displayMessage,
         'timestamp': Timestamp.now(),
       });
 

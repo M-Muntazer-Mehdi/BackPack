@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:back_packers/controllers/chat/chat_detail_controller.dart';
+import 'package:back_packers/controllers/chat/voice_recording_controller.dart';
 import 'package:back_packers/globals/adaptive_helper.dart';
 import 'package:back_packers/globals/app_views.dart';
 import 'package:back_packers/globals/database.dart';
@@ -15,6 +16,9 @@ import 'package:back_packers/models/group_chat_model.dart';
 import 'package:back_packers/models/local_chat_model.dart';
 import 'package:back_packers/models/user.dart';
 import 'package:back_packers/screens/main_screens/chat_view/widget/chat_list_item.dart';
+import 'package:back_packers/screens/main_screens/chat_view/widget/voice_recording_button.dart';
+import 'package:back_packers/screens/main_screens/chat_view/widget/recording_overlay_widget.dart';
+import 'package:back_packers/screens/main_screens/chat_view/widget/recording_indicator_widget.dart';
 import 'package:back_packers/services/local_notifications_helper.dart';
 import 'package:back_packers/utils/app_colors.dart';
 import 'package:back_packers/utils/login_details.dart';
@@ -37,16 +41,27 @@ class ChatDetailScreenState extends State<ChatDetailScreen> {
 
   @override
   void initState() {
+    super.initState();
+    
     controller.id = widget.chat.roomId;
-    controller.userId = widget.chat.roomId;
+    
+    // Get the other user's ID safely
+    try {
+      final currentUserId = Get.find<UserDetail>().userId;
+      controller.userId = widget.chat.user1?.id == currentUserId
+          ? (widget.chat.user2?.id ?? widget.chat.roomId)
+          : (widget.chat.user1?.id ?? widget.chat.roomId);
+    } catch (e) {
+      // Fallback to room ID if there's any issue
+      controller.userId = widget.chat.roomId;
+    }
+    
     stream = FirebaseFirestore.instance
         .collection('chats')
         .doc(widget.chat.roomId)
         .collection('messages')
         .orderBy('timestamp', descending: true)
         .snapshots();
-
-    super.initState();
   }
 
   @override
@@ -221,7 +236,24 @@ class ChatDetailScreenState extends State<ChatDetailScreen> {
                     )),
                   ],
                 ),
-              )
+              ),
+            // Recording overlay (locked state) - MUST be last to be on top
+            GetBuilder<VoiceRecordingController>(
+              init: controller.voiceRecordingController,
+              builder: (recordController) {
+                // Only show when recording is LOCKED
+                if (recordController.isRecordingLocked) {
+                  return Positioned.fill(
+                    child: RecordingOverlayWidget(
+                      controller: controller.voiceRecordingController,
+                      onSend: controller.handleLockedVoiceSend,
+                      onCancel: controller.cancelVoiceRecording,
+                    ),
+                  );
+                }
+                return const SizedBox.shrink();
+              },
+            ),
           ],
         )));
   }
@@ -348,10 +380,11 @@ class ChatDetailScreenState extends State<ChatDetailScreen> {
       children: [
         GetBuilder<ChatDetailController>(builder: (value) {
           return Visibility(
-            visible: value.loading,
+            visible: value.loading || value.isUploadingVoice,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: LinearProgressIndicator(
+                value: value.isUploadingVoice ? value.uploadProgress : null,
                 color: Colors.grey.withOpacity(0.3),
               ),
             ),
@@ -359,57 +392,53 @@ class ChatDetailScreenState extends State<ChatDetailScreen> {
         }),
         Row(
           children: [
+            // Attachment button (like WhatsApp) - for documents
+            Container(
+              margin: const EdgeInsets.only(left: 5),
+              child: IconButton(
+                icon: Icon(
+                  Icons.attach_file,
+                  color: Colors.white70,
+                  size: 26,
+                ),
+                onPressed: () {
+                  controller.showAttachmentPicker(context);
+                },
+              ),
+            ),
+            // Text input field
             Expanded(
               child: Container(
                 height: ht(45),
-                margin: const EdgeInsets.all(10),
+                margin: const EdgeInsets.symmetric(vertical: 10),
                 decoration: BoxDecoration(
                     color: const Color(0xff383838).withOpacity(0.8),
                     borderRadius: BorderRadius.circular(100)),
                 child: TextField(
                   onTap: () => controller.disableEmoji(),
+                  onChanged: controller.changeText,
                   textInputAction: TextInputAction.done,
                   keyboardType: TextInputType.text,
                   style: normalText(color: Colors.white),
                   controller: controller.controllerMessage,
                   textAlign: TextAlign.start,
                   decoration: InputDecoration(
-                    // fillColor: AppColors.primaryColor,
                     prefixIconConstraints: const BoxConstraints(minWidth: 35),
-                    suffixIcon: const Row(
+                    suffixIcon: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        // IconButton(
-                        //   icon: Transform.rotate(
-                        //       angle: -1,
-                        //       child: Icon(
-                        //         Icons.attachment,
-                        //         color: AppColors.brownText,
-                        //       )),
-                        //   onPressed: () {
-                        //     controller.showImagePicker(context);
-                        //   },
-                        // ),
+                        // Camera icon inside text field
+                        IconButton(
+                          icon: const Icon(
+                            Icons.camera_alt,
+                            color: Colors.white70,
+                          ),
+                          onPressed: () {
+                            controller.showCameraOptions(context);
+                          },
+                        ),
                       ],
                     ),
-                    // prefixIcon: InkWell(
-                    //   child: GetBuilder<ChatDetailController>(builder: (value) {
-                    //     return Container(
-                    //         margin: const EdgeInsets.only(left: 10, right: 20),
-                    //         alignment: Alignment.center,
-                    //         width: 30,
-                    //         child: Icon(
-                    //           !value.isShowEmojis
-                    //               ? Icons.emoji_emotions
-                    //               : Icons.keyboard,
-                    //           color: AppColors.brownText,
-                    //         ));
-                    //   }),
-                    //   onTap: () {
-                    //     controller.showEmoji();
-                    //     FocusScope.of(context).unfocus();
-                    //   },
-                    // ),
                     contentPadding: const EdgeInsets.only(top: 7, left: 15),
                     focusedBorder: AppViews.textFieldRoundBorder(),
                     border: AppViews.textFieldRoundBorder(),
@@ -417,36 +446,44 @@ class ChatDetailScreenState extends State<ChatDetailScreen> {
                     focusedErrorBorder: AppViews.textFieldRoundBorder(),
                     hintText: "Type your message...",
                     hintStyle: regularText(color: Colors.grey),
-                    // filled: true,
                   ),
                 ),
-                // color: Colors.red,
               ),
             ),
-            Container(
-              margin: const EdgeInsets.all(8),
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                  color: AppColors.primaryColor, shape: BoxShape.circle),
-              child: GetBuilder<ChatDetailController>(builder: (value) {
-                return InkWell(
-                  onTap: () {
-                    controller.sendMessage();
-                  },
-                  child: SizedBox(
-                    width: ht(45),
-                    height: ht(45),
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Icon(
-                        Icons.send,
-                        color: AppColors.colorWhite,
+            // Send or Mic button
+            GetBuilder<ChatDetailController>(builder: (value) {
+              // Show send button if there's text, otherwise show mic button
+              if (value.showSendButton) {
+                return Container(
+                  margin: const EdgeInsets.all(8),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                      color: AppColors.primaryColor, shape: BoxShape.circle),
+                  child: InkWell(
+                    onTap: () {
+                      controller.sendMessage();
+                    },
+                    child: SizedBox(
+                      width: ht(45),
+                      height: ht(45),
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Icon(
+                          Icons.send,
+                          color: AppColors.colorWhite,
+                        ),
                       ),
                     ),
                   ),
                 );
-              }),
-            ),
+              } else {
+                // Voice recording button
+                return VoiceRecordingButton(
+                  controller: controller.voiceRecordingController,
+                  onSendVoiceMessage: controller.sendVoiceMessage,
+                );
+              }
+            }),
           ],
         ),
       ],
@@ -482,6 +519,8 @@ class ChatDetailScreenState extends State<ChatDetailScreen> {
                             message: chatModel.message,
                             files: chatModel.files,
                             status: chatModel.status ?? 'Active',
+                            messageType: chatModel.messageType,
+                            voiceData: chatModel.voiceData,
                             mMsgType:
                                 chatModel.from == Get.find<UserDetail>().userId
                                     ? MsgType.right
@@ -507,6 +546,7 @@ class ChatDetailScreenState extends State<ChatDetailScreen> {
                           child: ChatListItem(
                             mChatModel: chat,
                             onTap: () {},
+                            audioPlayerController: controller.audioPlayerController,
                           ),
                         );
                       },
@@ -551,6 +591,10 @@ class ChatDetailScreenState extends State<ChatDetailScreen> {
               _emojiSection()
             ],
           ),
+        // Recording indicator (unlocked state)
+        RecordingIndicatorWidget(
+          controller: controller.voiceRecordingController,
+        ),
       ],
     );
   }

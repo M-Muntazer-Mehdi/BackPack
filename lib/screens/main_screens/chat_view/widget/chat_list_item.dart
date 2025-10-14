@@ -1,24 +1,79 @@
 import 'package:blur/blur.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:back_packers/globals/enum.dart';
 import 'package:back_packers/models/local_chat_model.dart';
+import 'package:back_packers/models/chat_model.dart';
 import 'package:back_packers/utils/app_colors.dart';
 import 'package:back_packers/utils/text_styles.dart';
+import 'package:back_packers/controllers/chat/audio_player_controller.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import 'image_view.dart';
 import 'images_list.dart';
+import 'voice_message_bubble.dart';
+import 'video_message_bubble.dart';
+import 'document_message_bubble.dart';
+import 'location_message_bubble.dart';
 
 class ChatListItem extends StatelessWidget {
   final LocalChatModel mChatModel;
   final Function onTap;
+  final AudioPlayerController? audioPlayerController;
 
-  const ChatListItem({Key? key, required this.mChatModel, required this.onTap})
-      : super(key: key);
+  const ChatListItem({
+    Key? key, 
+    required this.mChatModel, 
+    required this.onTap,
+    this.audioPlayerController,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    // Check if this is a voice message
+    if (mChatModel.messageType == MessageType.voice && 
+        mChatModel.voiceData != null &&
+        audioPlayerController != null) {
+      return VoiceMessageBubble(
+        voiceData: mChatModel.voiceData!,
+        msgType: mChatModel.mMsgType,
+        time: mChatModel.time,
+        playerController: audioPlayerController!,
+      );
+    }
+
+    // Check if this is a video message
+    if (mChatModel.messageType == MessageType.video && 
+        mChatModel.voiceData != null) {
+      return VideoMessageBubble(
+        videoData: mChatModel.voiceData!,
+        msgType: mChatModel.mMsgType,
+        time: mChatModel.time,
+      );
+    }
+
+    // Check if this is a document message
+    if (mChatModel.messageType == MessageType.document && 
+        mChatModel.voiceData != null) {
+      return DocumentMessageBubble(
+        documentData: mChatModel.voiceData!,
+        msgType: mChatModel.mMsgType,
+        time: mChatModel.time,
+      );
+    }
+
+    // Check if this is a location message
+    if (mChatModel.messageType == MessageType.location && 
+        mChatModel.voiceData != null) {
+      return LocationMessageBubble(
+        locationData: mChatModel.voiceData!,
+        msgType: mChatModel.mMsgType,
+        time: mChatModel.time,
+      );
+    }
+
+    // Otherwise render normal text/image message
     Widget mWidget = Container();
     switch (mChatModel.mMsgType) {
       case MsgType.left:
