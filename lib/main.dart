@@ -14,6 +14,7 @@ import 'package:overlay_support/overlay_support.dart';
 
 import 'bindings/initial_binding.dart';
 import 'globals/adaptive_helper.dart';
+import 'screens/splash/initial_splash_screen.dart';
 import 'screens/splash/splash_screen.dart';
 
 Future<void> main() async {
@@ -68,7 +69,7 @@ class BoosterMaterialApp extends StatelessWidget {
           defaultTransition: Transition.cupertino,
           debugShowCheckedModeBanner: false,
           initialBinding: InitialBinding(),
-          home: login ? NavBarScreen() : SplashScreen(),
+          home: InitialSplashScreen(isLoggedIn: login),
           builder: EasyLoading.init(),
         );
       },
