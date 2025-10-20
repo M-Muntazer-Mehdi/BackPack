@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'dart:io';
+import 'dart:math' as math;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -7,18 +8,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:back_packers/globals/adaptive_helper.dart';
 import 'package:back_packers/globals/enum.dart';
 import 'package:back_packers/globals/global.dart';
 import 'package:back_packers/globals/network_image.dart';
 import 'package:back_packers/models/user.dart';
 import 'package:back_packers/utils/app_colors.dart';
 import 'package:back_packers/utils/login_details.dart';
-import 'package:back_packers/utils/text_styles.dart';
-import 'package:back_packers/widgets/appbars.dart';
-import 'package:back_packers/widgets/custom_bottom_option_sheet.dart';
-import 'package:back_packers/widgets/primary_button.dart';
-import 'package:back_packers/widgets/text_fields.dart';
+import 'package:back_packers/widgets/image_picker_modal.dart';
+import 'package:back_packers/widgets/success_modal.dart';
 
 class EditDetails extends StatefulWidget {
   const EditDetails({super.key});
@@ -27,7 +24,7 @@ class EditDetails extends StatefulWidget {
   State<EditDetails> createState() => _EditDetailsState();
 }
 
-class _EditDetailsState extends State<EditDetails> {
+class _EditDetailsState extends State<EditDetails> with TickerProviderStateMixin {
   TextEditingController nameCont = TextEditingController();
   TextEditingController lastnameCont = TextEditingController();
   TextEditingController emailCont = TextEditingController();
@@ -38,6 +35,52 @@ class _EditDetailsState extends State<EditDetails> {
   FocusNode emailFocus = FocusNode();
   String imageUrl = '';
   var isLoading = false;
+  
+  late AnimationController _fadeController;
+  late AnimationController _floatController;
+  late Animation<double> _fadeAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    getProfile();
+    
+    _fadeController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+    
+    _floatController = AnimationController(
+      duration: const Duration(seconds: 3),
+      vsync: this,
+    )..repeat(reverse: true);
+    
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _fadeController,
+      curve: Curves.easeOut,
+    ));
+    
+    _fadeController.forward();
+  }
+
+  @override
+  void dispose() {
+    _fadeController.dispose();
+    _floatController.dispose();
+    nameCont.dispose();
+    lastnameCont.dispose();
+    emailCont.dispose();
+    numberCont.dispose();
+    nameFocus.dispose();
+    numberFocus.dispose();
+    lastname.dispose();
+    emailFocus.dispose();
+    super.dispose();
+  }
+
   getProfile() async {
     try {
       isLoading = true;
@@ -141,15 +184,17 @@ class _EditDetailsState extends State<EditDetails> {
           'image': imageUrl,
           'phone': numberCont.text,
         });
-        Global.showToastAlert(
-            context: Get.overlayContext!,
-            strTitle: "",
-            strMsg: 'Profile Updated',
-            toastType: TOAST_TYPE.toastSuccess);
         Get.find<UserDetail>()
             .updateProfile(nameCont.text, lastnameCont.text, imageUrl);
-        // Get.back();
         EasyLoading.dismiss();
+        
+        // Show beautiful success modal
+        await Future.delayed(const Duration(milliseconds: 100));
+        SuccessModal.show(
+          title: 'Success!',
+          message: 'Your profile has been updated successfully',
+          buttonText: 'Done',
+        );
       } catch (e) {
         EasyLoading.dismiss();
       }
@@ -159,171 +204,428 @@ class _EditDetailsState extends State<EditDetails> {
   }
 
   @override
-  void initState() {
-    getProfile();
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: customAppBar(backButton: true, title: 'Edit Profile'),
-      backgroundColor: AppColors.scaffoldBackgroundColor,
-      body: SafeArea(
-        child: ListView(
-          padding: EdgeInsets.symmetric(horizontal: wd(30), vertical: ht(15)),
+      backgroundColor: Colors.white,
+      body: Stack(
           children: [
-            const SizedBox(
-              height: 30,
-            ),
-            GestureDetector(
-              onTap: () {
-                customBottomSheet(['Camera', 'Gallery'], -1, (i) {
-                  if (i == 0) {
-                    uploadImage();
-                  } else {
-                    uploadImage(isCamera: false);
-                  }
-                });
-              },
-              child: Center(
+          // Decorative background circles
+          Positioned(
+            top: -80,
+            right: -80,
                 child: Container(
+              width: 200,
+              height: 200,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(100),
-                    color: Colors.grey.shade300,
-                  ),
-                  height: ht(90),
-                  width: ht(90),
-                  child: Center(
-                    child: imageUrl == ''
-                        ? const Icon(Icons.image)
-                        : ClipRRect(
-                            borderRadius: BorderRadius.circular(100),
-                            child: NetworkImageCustom(
-                                fit: BoxFit.cover,
-                                height: double.infinity,
-                                width: double.infinity,
-                                image: imageUrl),
-                          ),
-                  ),
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [
+                    AppColors.primaryColor.withOpacity(0.1),
+                    AppColors.primaryColor.withOpacity(0.02),
+                    Colors.transparent,
+                  ],
                 ),
               ),
             ),
-            const SizedBox(
-              height: 20,
-            ),
-            Center(
-              child: Text(
-                "${nameCont.text} ${lastnameCont.text}",
-                style: regularText(size: 16, color: Colors.white),
+          ),
+          Positioned(
+            bottom: -60,
+            left: -60,
+            child: Container(
+              width: 150,
+              height: 150,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [
+                    AppColors.primaryLight.withOpacity(0.08),
+                    AppColors.primaryLight.withOpacity(0.02),
+                    Colors.transparent,
+                  ],
+                ),
               ),
             ),
-            SizedBox(
-              height: ht(50),
+          ),
+          
+          // Main content
+          SafeArea(
+            child: FadeTransition(
+              opacity: _fadeAnimation,
+              child: Column(
+                children: [
+                  // Custom app bar
+                  _buildCustomAppBar(),
+                  
+                  // Scrollable content
+                  Expanded(
+                    child: ListView(
+                      physics: const BouncingScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      children: [
+                        const SizedBox(height: 20),
+                        
+                        // Profile photo section
+                        _buildProfilePhotoSection(),
+                        
+                        const SizedBox(height: 40),
+                        
+                        // Form fields
+                        _buildPremiumTextField(
+                          controller: nameCont,
+                          focusNode: nameFocus,
+                          icon: Icons.person_outline_rounded,
+                          label: 'First Name',
+                          hint: 'Enter your first name',
+                        ),
+                        
+                        const SizedBox(height: 16),
+                        
+                        _buildPremiumTextField(
+                          controller: lastnameCont,
+                          focusNode: lastname,
+                          icon: Icons.person_outline_rounded,
+                          label: 'Last Name',
+                          hint: 'Enter your last name',
+                        ),
+                        
+                        const SizedBox(height: 16),
+                        
+                        _buildPremiumTextField(
+                          controller: numberCont,
+                          focusNode: numberFocus,
+                          icon: Icons.phone_outlined,
+                          label: 'Phone Number',
+                          hint: 'Enter your phone number',
+                          keyboardType: TextInputType.phone,
+                        ),
+                        
+                        const SizedBox(height: 16),
+                        
+                        _buildPremiumTextField(
+                          controller: emailCont,
+                          focusNode: emailFocus,
+                          icon: Icons.email_outlined,
+                          label: 'Email',
+                          hint: 'Enter your email',
+                          readOnly: true,
+                          enabled: false,
+                        ),
+                        
+                        const SizedBox(height: 40),
+                        
+                        // Update button
+                        _buildUpdateButton(),
+                        
+                        const SizedBox(height: 30),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-            Column(
-              children: [
-                _userSignUp(),
-                SizedBox(
-                  height: ht(45),
-                ),
-                PrimaryButton(
-                  label: 'Update Profile',
-                  onPress: () {
-                    validateRegister();
-                  },
-                ),
-              ],
-            )
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _userSignUp() {
-    return Column(
+  Widget _buildCustomAppBar() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        children: [
+          GestureDetector(
+            onTap: () => Get.back(),
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: AppColors.bgGrey,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: AppColors.borderColor.withOpacity(0.3),
+                  width: 1,
+                ),
+              ),
+              child: Icon(
+                Icons.arrow_back_rounded,
+                color: AppColors.txtDark,
+                size: 20,
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ShaderMask(
+                  shaderCallback: (bounds) => LinearGradient(
+                    colors: [
+                      AppColors.primaryDark,
+                      AppColors.primaryColor,
+                    ],
+                  ).createShader(bounds),
+                  child: const Text(
+                    'Edit Profile',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.white,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  'Update your personal information',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.txtMuted,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProfilePhotoSection() {
+    return Center(
+      child: Stack(
+        clipBehavior: Clip.none,
       children: [
-        SizedBox(
-          height: ht(12),
-        ),
-        customTextFiled(
-            nameCont,
-            nameFocus,
-            [],
-            SizedBox(
-              height: 50,
-              width: 40,
-              child: Center(
-                child: Image.asset(
-                  'assets/images/ic_person.png',
-                  height: 18,
+          // Animated profile photo
+          AnimatedBuilder(
+            animation: _floatController,
+            builder: (context, child) {
+              return Transform.translate(
+                offset: Offset(
+                  0,
+                  math.sin(_floatController.value * 2 * math.pi) * 4,
+                ),
+                child: GestureDetector(
+                  onTap: () {
+                    ImagePickerModal.show(
+                      onCamera: () => uploadImage(),
+                      onGallery: () => uploadImage(isCamera: false),
+                    );
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primaryColor.withOpacity(0.3),
+                          blurRadius: 30,
+                          offset: const Offset(0, 10),
+                          spreadRadius: 5,
+                        ),
+                      ],
+                    ),
+                    child: CircleAvatar(
+                      radius: 60,
+                      backgroundColor: Colors.white,
+                      child: CircleAvatar(
+                        radius: 58,
+                        backgroundColor: AppColors.bgGrey,
+                        child: imageUrl == ''
+                            ? Icon(
+                                Icons.person_rounded,
+                                size: 50,
                   color: AppColors.iconColor,
+                              )
+                            : ClipRRect(
+                                borderRadius: BorderRadius.circular(58),
+                                child: NetworkImageCustom(
+                                  fit: BoxFit.cover,
+                                  height: double.infinity,
+                                  width: double.infinity,
+                                  image: imageUrl,
+                                ),
+                              ),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+          
+          // Camera button
+          Positioned(
+            bottom: 0,
+            right: -5,
+            child: GestureDetector(
+              onTap: () {
+                ImagePickerModal.show(
+                  onCamera: () => uploadImage(),
+                  onGallery: () => uploadImage(isCamera: false),
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  gradient: AppColors.primaryGradient,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Colors.white,
+                    width: 3,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primaryColor.withOpacity(0.4),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.camera_alt_rounded,
+                  color: Colors.white,
+                  size: 20,
                 ),
               ),
             ),
-            hint: 'First Name'),
-        SizedBox(
-          height: ht(12),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPremiumTextField({
+    required TextEditingController controller,
+    required FocusNode focusNode,
+    required IconData icon,
+    required String label,
+    required String hint,
+    TextInputType keyboardType = TextInputType.text,
+    bool readOnly = false,
+    bool enabled = true,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 8),
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: AppColors.txtDark,
+              letterSpacing: 0.3,
+            ),
+          ),
         ),
-        customTextFiled(
-            lastnameCont,
-            lastname,
-            [],
-            SizedBox(
-              height: 50,
-              width: 40,
-              child: Center(
-                child: Image.asset(
-                  'assets/images/ic_person.png',
-                  height: 18,
-                  color: AppColors.iconColor,
+        Container(
+          decoration: BoxDecoration(
+            color: enabled ? Colors.white : AppColors.bgGrey,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: focusNode.hasFocus 
+                  ? AppColors.primaryColor 
+                  : AppColors.borderColor.withOpacity(0.3),
+              width: 1.5,
+            ),
+            boxShadow: focusNode.hasFocus
+                ? [
+                    BoxShadow(
+                      color: AppColors.primaryColor.withOpacity(0.1),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ]
+                : [],
+          ),
+          child: TextField(
+            controller: controller,
+            focusNode: focusNode,
+            keyboardType: keyboardType,
+            readOnly: readOnly,
+            enabled: enabled,
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: enabled ? AppColors.txtDark : AppColors.txtMuted,
+            ),
+            decoration: InputDecoration(
+              hintText: hint,
+              hintStyle: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: AppColors.txtMuted,
+              ),
+              prefixIcon: Container(
+                margin: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  gradient: enabled ? AppColors.primaryGradient : null,
+                  color: enabled ? null : AppColors.borderColor.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  icon,
+                  color: Colors.white,
+                  size: 18,
                 ),
               ),
-            ),
-            hint: 'Last Name'),
-        SizedBox(
-          height: ht(12),
-        ),
-        customTextFiled(
-            numberCont,
-            numberFocus,
-            [],
-            SizedBox(
-              height: 50,
-              width: 40,
-              child: Center(
-                child: Image.asset(
-                  'assets/images/ic_phone.png',
-                  height: 18,
-                  color: AppColors.iconColor,
-                ),
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 16,
               ),
             ),
-            hint: 'Phone Number'),
-        SizedBox(
-          height: ht(12),
-        ),
-        customTextFiled(
-            emailCont,
-            emailFocus,
-            [],
-            SizedBox(
-              height: 50,
-              width: 40,
-              child: Center(
-                child: Image.asset(
-                  'assets/images/ic_email.png',
-                  height: 14,
-                  color: AppColors.iconColor,
-                ),
-              ),
-            ),
-            hint: 'Email'),
-        SizedBox(
-          height: ht(12),
+            onChanged: (value) => setState(() {}),
+          ),
         ),
       ],
+    );
+  }
+
+  Widget _buildUpdateButton() {
+    return GestureDetector(
+      onTap: () {
+        validateRegister();
+      },
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        decoration: BoxDecoration(
+          gradient: AppColors.primaryGradient,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primaryColor.withOpacity(0.4),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+              spreadRadius: 2,
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: const [
+            Icon(
+              Icons.check_circle_rounded,
+              size: 20,
+              color: Colors.white,
+            ),
+            SizedBox(width: 10),
+            Text(
+              'Update Profile',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w800,
+                color: Colors.white,
+                letterSpacing: 0.3,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
