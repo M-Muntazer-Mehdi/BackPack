@@ -24,6 +24,9 @@ import '../../utils/app_colors.dart';
 import '../../utils/login_details.dart';
 import '../../utils/text_styles.dart';
 import '../../widgets/primary_button.dart';
+import '../../widgets/buddy_modal.dart';
+import '../../widgets/accommodation_modal.dart';
+import '../../widgets/job_modal.dart';
 import '../location_manager.dart';
 
 class StoreController extends GetxController {
@@ -192,26 +195,26 @@ class StoreController extends GetxController {
 
   getHostels({String data = ''}) {
     if (selectedCat == 0 || selectedCat == 2) {
-   post(Uri.parse('https://places.googleapis.com/v1/places:searchText'),
-          body: jsonEncode({
-            "textQuery": "hostel",
-            "maxResultCount": 20,
-            "locationBias": {
-              "circle": {
-                "center": {
-                  "latitude": latLng.latitude,
-                  "longitude": latLng.longitude
-                },
-                "radius": radius
-              }
+      post(Uri.parse('https://places.googleapis.com/v1/places:searchText'),
+        body: jsonEncode({
+          "textQuery": "hostel",
+          "maxResultCount": 20,
+          "locationBias": {
+            "circle": {
+              "center": {
+                "latitude": latLng.latitude,
+                "longitude": latLng.longitude
+              },
+              "radius": radius
             }
-          }),
-          headers: {
-            'X-Goog-Api-Key': LocationController.apiKey,
-            'X-Goog-FieldMask':
-                'places.formattedAddress,places.displayName,places.location,places.id'
-          }).then((value) async {
-            debugPrint("response is : ${value.body}");
+          }
+        }),
+        headers: {
+          'X-Goog-Api-Key': LocationController.apiKey,
+          'X-Goog-FieldMask':
+              'places.formattedAddress,places.displayName,places.location,places.id'
+        }).then((value) async {
+        debugPrint("response is : ${value.body}");
         if (value.statusCode == 200) {
           List data = (jsonDecode(value.body)['places'] ?? []) as List;
 
@@ -239,11 +242,10 @@ class StoreController extends GetxController {
       markerId: markerId,
       position: latLng,
       icon: BitmapDescriptor.fromBytes(icon),
-      infoWindow: InfoWindow(
-          title: itemModel.title,
-          onTap: () {
-            Get.to(() => AppliedJobDetails(itemModel: itemModel));
-          }),
+      onTap: () {
+        // Show beautiful job modal
+        JobModal.show(itemModel);
+      },
     );
   }
 
@@ -254,37 +256,8 @@ class StoreController extends GetxController {
       markerId: markerId,
       position: latLng,
       onTap: () {
-        Get.bottomSheet(Container(
-          width: double.infinity,
-          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 30),
-          decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                data['displayName']['text'],
-                style: subHeadingText(size: 23, color: AppColors.primaryColor),
-              ),
-              15.hp,
-              Text(
-                data['formattedAddress'] ?? "",
-                style: subHeadingText(
-                  size: 16,
-                ),
-              ),
-              30.hp,
-              PrimaryButton(
-                  label: 'Get Direction',
-                  onPress: () {
-                    launchUrl(Uri.parse(
-                        'https://www.google.com/maps/search/?api=1&query=${latLng.latitude},${latLng.longitude}'));
-                  })
-            ],
-          ),
-        ));
+        // Show beautiful accommodation modal
+        AccommodationModal.show(data, latLng);
       },
       icon: BitmapDescriptor.fromBytes(icon),
     );
@@ -297,20 +270,10 @@ class StoreController extends GetxController {
       markerId: markerId,
       position: latLng,
       icon: BitmapDescriptor.fromBytes(icon),
-      infoWindow: InfoWindow(
-          title: "${userModel.fname} ${userModel.lname}",
-          onTap: () {
-            Get.bottomSheet(
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                        padding: EdgeInsets.all(15),
-                        child: Center(child: buddieContainer(userModel))),
-                  ],
-                ),
-                isScrollControlled: true);
-          }),
+      onTap: () {
+        // Show beautiful buddy modal
+        BuddyModal.show(userModel);
+      },
     );
   }
 }
