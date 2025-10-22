@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:back_packers/globals/container_properties.dart';
 import 'package:back_packers/globals/database.dart';
@@ -36,6 +37,15 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     
+    // Set status bar style
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light,
+      ),
+    );
+    
     // Header gradient animation
     _headerAnimController = AnimationController(
       duration: const Duration(seconds: 4),
@@ -51,6 +61,15 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   @override
   void dispose() {
+    // Reset status bar to default
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light,
+      ),
+    );
+    
     _headerAnimController.dispose();
     _floatController.dispose();
     search.dispose();
@@ -61,9 +80,9 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.bgGrey,
-      body: SafeArea(
-        child: Column(
-          children: [
+      extendBodyBehindAppBar: true,
+      body: Column(
+        children: [
             // Premium header
             _buildHeader(),
             
@@ -79,8 +98,7 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             ),
           ],
         ),
-      ),
-    );
+      );
   }
 
   Widget _buildHeader() {
@@ -89,6 +107,9 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       builder: (context, child) {
         return Container(
           clipBehavior: Clip.none,
+          padding: EdgeInsets.only(
+            top: MediaQuery.of(context).padding.top * 0.6,
+          ),
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,

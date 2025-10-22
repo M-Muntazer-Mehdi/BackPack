@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:back_packers/screens/main_screens/bottom_bar_screen.dart';
 import 'package:back_packers/screens/splash/splash_screen.dart';
@@ -21,6 +22,7 @@ class _InitialSplashScreenState extends State<InitialSplashScreen> with TickerPr
   late AnimationController _rotateController;
   late AnimationController _textController;
   late AnimationController _fadeOutController;
+  late AnimationController _loadingController;
   
   late Animation<double> _logoScaleAnimation;
   late Animation<double> _logoOpacityAnimation;
@@ -32,6 +34,15 @@ class _InitialSplashScreenState extends State<InitialSplashScreen> with TickerPr
   @override
   void initState() {
     super.initState();
+    
+    // Set status bar style
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light,
+      ),
+    );
     
     // Logo animations - Dramatic entrance
     _logoController = AnimationController(
@@ -117,6 +128,12 @@ class _InitialSplashScreenState extends State<InitialSplashScreen> with TickerPr
       curve: Curves.easeInCubic,
     ));
     
+    // Loading indicator animation (separate from rotating rings)
+    _loadingController = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    )..repeat();
+    
     // Start animations sequence
     _startAnimationSequence();
   }
@@ -150,18 +167,30 @@ class _InitialSplashScreenState extends State<InitialSplashScreen> with TickerPr
 
   @override
   void dispose() {
+    // Reset status bar to default
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light,
+      ),
+    );
+    
     _logoController.dispose();
     _particleController.dispose();
     _waveController.dispose();
     _rotateController.dispose();
     _textController.dispose();
     _fadeOutController.dispose();
+    _loadingController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
+      extendBodyBehindAppBar: true,
       body: AnimatedBuilder(
         animation: _fadeOutController,
         builder: (context, child) {
@@ -189,10 +218,14 @@ class _InitialSplashScreenState extends State<InitialSplashScreen> with TickerPr
                   ..._buildRotatingRings(),
                   
                   // Main content
-                  Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
+                  Padding(
+                    padding: EdgeInsets.only(
+                      top: MediaQuery.of(context).padding.top,
+                    ),
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
                         // Particle explosion around logo
                         AnimatedBuilder(
                           animation: Listenable.merge([
@@ -232,11 +265,10 @@ class _InitialSplashScreenState extends State<InitialSplashScreen> with TickerPr
                                         ),
                                         child: Center(
                                           child: Image.asset(
-                                            'assets/images/splash_img.png',
+                                            'assets/images/splash_image.png',
                                             width: 100,
                                             height: 100,
                                             fit: BoxFit.contain,
-                                            color: Colors.white,
                                           ),
                                         ),
                                       ),
@@ -289,6 +321,7 @@ class _InitialSplashScreenState extends State<InitialSplashScreen> with TickerPr
                       ],
                     ),
                   ),
+                ),
                   
                   // Loading indicator at bottom
                   Positioned(
@@ -490,7 +523,7 @@ class _InitialSplashScreenState extends State<InitialSplashScreen> with TickerPr
 
   Widget _buildLoadingIndicator() {
     return AnimatedBuilder(
-      animation: _rotateController,
+      animation: _loadingController,
       builder: (context, child) {
         return Column(
           children: [
@@ -512,7 +545,7 @@ class _InitialSplashScreenState extends State<InitialSplashScreen> with TickerPr
                   ),
                   // Animated arc
                   Transform.rotate(
-                    angle: _rotateController.value * 2 * math.pi,
+                    angle: _loadingController.value * 2 * math.pi,
                     child: CustomPaint(
                       size: const Size(40, 40),
                       painter: ArcPainter(

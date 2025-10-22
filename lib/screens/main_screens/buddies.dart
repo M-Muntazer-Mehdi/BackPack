@@ -35,6 +35,15 @@ class _BuddiesState extends State<Buddies> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     
+    // Set status bar style
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light,
+      ),
+    );
+    
     // Header gradient animation
     _headerAnimController = AnimationController(
       duration: const Duration(seconds: 4),
@@ -57,6 +66,15 @@ class _BuddiesState extends State<Buddies> with TickerProviderStateMixin {
 
   @override
   void dispose() {
+    // Reset status bar to default
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light,
+      ),
+    );
+    
     _headerAnimController.dispose();
     _floatController.dispose();
     _filterExpandController.dispose();
@@ -78,8 +96,8 @@ class _BuddiesState extends State<Buddies> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.bgGrey,
-      body: SafeArea(
-        child: GetBuilder<StoreController>(
+      extendBodyBehindAppBar: true,
+      body: GetBuilder<StoreController>(
           builder: (logic) {
             return Column(
               children: [
@@ -145,12 +163,11 @@ class _BuddiesState extends State<Buddies> with TickerProviderStateMixin {
                     },
                   ),
                 ),
-              ],
-            );
+                ],
+              );
           },
         ),
-      ),
-    );
+      );
   }
 
   Widget _buildFilterToggleButton() {
@@ -599,6 +616,9 @@ class _BuddiesState extends State<Buddies> with TickerProviderStateMixin {
       builder: (context, child) {
         return Container(
           clipBehavior: Clip.none,
+          padding: EdgeInsets.only(
+            top: MediaQuery.of(context).padding.top * 0.6,
+          ),
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,

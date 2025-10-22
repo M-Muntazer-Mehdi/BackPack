@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:back_packers/globals/adaptive_helper.dart';
 import 'package:back_packers/screens/auth_screens/login.dart';
@@ -20,6 +21,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
   late AnimationController _shimmerController;
   late AnimationController _rotateController;
   late AnimationController _particleController;
+  late AnimationController _dragController;
   
   late Animation<double> _logoFadeAnimation;
   late Animation<double> _logoScaleAnimation;
@@ -32,10 +34,23 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
   late Animation<double> _buttonSlideAnimation;
   late Animation<double> _shimmerAnimation;
   late Animation<double> _particleAnimation;
+  late Animation<double> _dragAnimation;
+  
+  double _dragOffset = 0.0;
+  bool _isDragging = false;
 
   @override
   void initState() {
     super.initState();
+    
+    // Set status bar style
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light,
+      ),
+    );
     
     // Main controller for staggered entrance animations
     _controller = AnimationController(
@@ -176,6 +191,20 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
         curve: Curves.easeOut,
       ),
     );
+    
+    // Drag animation controller
+    _dragController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    
+    _dragAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _dragController,
+      curve: Curves.easeOutCubic,
+    ));
 
     // Start animations
     _controller.forward();
@@ -184,10 +213,20 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
 
   @override
   void dispose() {
+    // Reset status bar to default
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light,
+      ),
+    );
+    
     _controller.dispose();
     _shimmerController.dispose();
     _rotateController.dispose();
     _particleController.dispose();
+    _dragController.dispose();
     super.dispose();
   }
 
@@ -195,16 +234,20 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      extendBodyBehindAppBar: true,
       body: Stack(
         children: [
           // Animated background purple circles
           _buildBackgroundCircles(),
           
           // Main content
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: Column(
+          Padding(
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top,
+              left: 24,
+              right: 24,
+            ),
+        child: Column(
                 children: [
                   const Spacer(flex: 2),
                   
@@ -214,7 +257,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                     builder: (context, child) {
                       return Stack(
                         alignment: Alignment.center,
-                        children: [
+          children: [
                           // Particle effects around logo
                           ...List.generate(8, (index) {
                             final angle = (index * math.pi * 2) / 8;
@@ -267,7 +310,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                                   ),
                                   padding: const EdgeInsets.all(32),
                                   child: Image.asset(
-                                    'assets/images/splash_img.png',
+              'assets/images/splash_image2.png',
                                     fit: BoxFit.contain,
                                   ),
                                 ),
@@ -302,16 +345,16 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                                 ).createShader(bounds),
                                 child: const Text(
                                   'BackPack Buddies',
-                                  textAlign: TextAlign.center,
+                    textAlign: TextAlign.center,
                                   style: TextStyle(
                                     fontSize: 36,
                                     fontWeight: FontWeight.w800,
-                                    color: Colors.white,
+                      color: Colors.white,
                                     letterSpacing: -0.5,
                                     height: 1.2,
-                                  ),
-                                ),
-                              ),
+                    ),
+                  ),
+                ),
                               
                               SizedBox(height: ht(16)),
                               
@@ -360,83 +403,15 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                   
                   SizedBox(height: ht(50)),
                   
-                  // Get Started button with cool shimmer effect
+                  // Draggable bag icon with swipe gesture
                   AnimatedBuilder(
-                    animation: Listenable.merge([_controller, _shimmerController]),
+                    animation: Listenable.merge([_controller, _dragController]),
                     builder: (context, child) {
                       return Opacity(
                         opacity: _buttonFadeAnimation.value,
                         child: Transform.translate(
                           offset: Offset(0, _buttonSlideAnimation.value),
-                          child: Container(
-                            width: double.infinity,
-                            height: 60,
-                            decoration: BoxDecoration(
-                              gradient: AppColors.primaryGradient,
-                              borderRadius: BorderRadius.circular(30),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppColors.primaryColor.withOpacity(0.3),
-                                  blurRadius: 20,
-                                  offset: const Offset(0, 10),
-                                ),
-                                BoxShadow(
-                                  color: AppColors.primaryColor.withOpacity(0.2),
-                                  blurRadius: 40,
-                                  spreadRadius: 5,
-                                ),
-                              ],
-                            ),
-                            child: Stack(
-                              children: [
-                                // Shimmer effect overlay
-                                Positioned.fill(
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(30),
-                                    child: Transform.translate(
-                                      offset: Offset(_shimmerAnimation.value * MediaQuery.of(context).size.width, 0),
-                                      child: Container(
-                                        width: 100,
-        decoration: BoxDecoration(
-            gradient: LinearGradient(
-                                            colors: [
-                                              Colors.transparent,
-                                              Colors.white.withOpacity(0.3),
-                                              Colors.transparent,
-                                            ],
-                                            stops: const [0.0, 0.5, 1.0],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                // Button content
-                                Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
-                                    onTap: () {
-                                      Get.off(() => const OnboardingScreen());
-                                    },
-                                    borderRadius: BorderRadius.circular(30),
-                                    splashColor: AppColors.primaryDarker.withOpacity(0.5),
-                                    highlightColor: AppColors.primaryDarker.withOpacity(0.3),
-                                    child: const Center(
-                  child: Text(
-                                        'Get Started',
-                                        style: TextStyle(
-                      color: Colors.white,
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w700,
-                                          letterSpacing: 0.5,
-                                        ),
-                                      ),
-                    ),
-                  ),
-                ),
-                              ],
-                            ),
-                          ),
+                          child: _buildDraggableBagIcon(),
                         ),
                       );
                     },
@@ -446,7 +421,6 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                 ],
               ),
             ),
-          ),
         ],
       ),
     );
@@ -496,6 +470,266 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
     );
   }
 
+  Widget _buildDraggableBagIcon() {
+    return Center(
+      child: Column(
+        children: [
+          // Drag instruction text
+          Container(
+            margin: EdgeInsets.only(bottom: 10),
+            child: Text(
+              'Drag the bag to the right to start',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: AppColors.txtGrey,
+                letterSpacing: 0.3,
+              ),
+            ),
+          ),
+          
+          SizedBox(height: ht(20)),
+          
+          // Modern futuristic button with bag icon
+          Container(
+            width: 320,
+            height: 60,
+            clipBehavior: Clip.none,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.white,
+                  Colors.grey.shade50,
+                ],
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.08),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
+                ),
+                BoxShadow(
+                  color: AppColors.primaryColor.withOpacity(0.1),
+                  blurRadius: 40,
+                  spreadRadius: 5,
+                ),
+              ],
+            ),
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                // Animated background glow
+                AnimatedContainer(
+                  duration: Duration(milliseconds: 300),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    gradient: RadialGradient(
+                      center: Alignment.centerLeft,
+                      radius: 1.5,
+                      colors: [
+                        AppColors.primaryColor.withOpacity(_dragOffset > 0 ? 0.3 : 0.1),
+                        Colors.transparent,
+                      ],
+                    ),
+                  ),
+                ),
+                
+                 // Purple fill that appears when dragging
+                 AnimatedContainer(
+                   duration: Duration(milliseconds: 200),
+                   width: _dragOffset > 0 ? _dragOffset.clamp(0, 320) : 0,
+                   height: 60,
+                   decoration: BoxDecoration(
+                     gradient: LinearGradient(
+                       begin: Alignment.centerLeft,
+                       end: Alignment.centerRight,
+                       colors: [
+                         AppColors.primaryColor.withOpacity(0.9),
+                         AppColors.primaryColor.withOpacity(0.7),
+                       ],
+                     ),
+                     borderRadius: BorderRadius.circular(10),
+                     boxShadow: [
+                       BoxShadow(
+                         color: AppColors.primaryColor.withOpacity(0.3),
+                         blurRadius: 15,
+                         offset: const Offset(0, 5),
+                       ),
+                     ],
+                   ),
+                 ),
+                
+                // Progress border with glow effect
+                AnimatedContainer(
+                  duration: Duration(milliseconds: 200),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: AppColors.primaryColor.withOpacity(0.8),
+                      width: (_dragOffset / 100).clamp(0.0, 1.0) * 4,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primaryColor.withOpacity(0.4),
+                        blurRadius: (_dragOffset / 100).clamp(0.0, 1.0) * 20,
+                        spreadRadius: (_dragOffset / 100).clamp(0.0, 1.0) * 5,
+                      ),
+                    ],
+                  ),
+                ),
+                
+                // Modern bag icon with glassmorphism effect
+                Positioned(
+                  left: -5, // Left position
+                  top: -30, // Move up so top part extends outside
+                  child: GestureDetector(
+                    onPanStart: (details) {
+                      setState(() {
+                        _isDragging = true;
+                      });
+                    },
+                    onPanUpdate: (details) {
+                      setState(() {
+                        _dragOffset += details.delta.dx;
+                        // Limit drag to right direction only
+                        if (_dragOffset < 0) _dragOffset = 0;
+                      });
+                    },
+                    onPanEnd: (details) {
+                      setState(() {
+                        _isDragging = false;
+                      });
+                      
+                      // Check if dragged far enough to trigger navigation
+                      if (_dragOffset > 120) {
+                        _dragController.forward().then((_) {
+                          Get.off(() => const OnboardingScreen());
+                        });
+                      } else {
+                        // Snap back to original position
+                        _dragController.reverse();
+                        setState(() {
+                          _dragOffset = 0;
+                        });
+                      }
+                    },
+                    child: AnimatedBuilder(
+                      animation: _dragController,
+                      builder: (context, child) {
+                        final animatedOffset = _isDragging 
+                            ? _dragOffset 
+                            : _dragOffset * (1 - _dragAnimation.value);
+                        
+                        return Transform.translate(
+                          offset: Offset(animatedOffset, 0),
+                          child: Transform.scale(
+                            scale: _isDragging ? 1.15 : 1.0,
+                            child: Stack(
+                              children: [
+                                // Custom bag icon without any background
+                                Image.asset(
+                                  'assets/images/bag_pack.png',
+                                  width: 100,
+                                  height: 100,
+                                  fit: BoxFit.contain,
+                                ),
+                                
+                                // Drag indicator with modern design
+                                if (_isDragging)
+                                  Positioned(
+                                    right: 0,
+                                    top: 0,
+                                    child: Container(
+                                      width: 20,
+                                      height: 20,
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(10),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: AppColors.primaryColor.withOpacity(0.3),
+                                            blurRadius: 8,
+                                            spreadRadius: 1,
+                                          ),
+                                        ],
+                                      ),
+                                      child: Icon(
+                                        Icons.arrow_forward_ios_rounded,
+                                        size: 12,
+                                        color: AppColors.primaryColor,
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+                
+                // Modern text indicator
+                if (_dragOffset > 40)
+                  Positioned(
+                    right: 25,
+                    top: 30,
+                    child: AnimatedOpacity(
+                      opacity: (_dragOffset / 120).clamp(0.0, 1.0),
+                      duration: Duration(milliseconds: 200),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.95),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: AppColors.primaryColor.withOpacity(0.3),
+                            width: 1,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 10,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Continue',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryColor,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                            SizedBox(width: 6),
+                            Icon(
+                              Icons.arrow_forward_rounded,
+                              size: 16,
+                              color: AppColors.primaryColor,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          
+          SizedBox(height: ht(16)),
+        ],
+      ),
+    );
+  }
+  
   Widget _buildBackgroundCircles() {
     return AnimatedBuilder(
       animation: _rotateController,

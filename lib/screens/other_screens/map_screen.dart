@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:back_packers/controllers/mainScreen_controllers/store_controller.dart';
@@ -40,6 +41,15 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    
+    // Set status bar style
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light,
+      ),
+    );
     
     // Filter slide animation
     _filterController = AnimationController(
@@ -132,6 +142,15 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
 
   @override
   void dispose() {
+    // Reset status bar to default
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light,
+      ),
+    );
+    
     _filterController.dispose();
     _buttonMorphController.dispose();
     _particleController.dispose();
@@ -160,6 +179,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
     return GetBuilder<StoreController>(
       builder: (logic) {
       return Scaffold(
+          extendBodyBehindAppBar: true,
           body: Stack(
           children: [
               // Google Map
@@ -205,6 +225,9 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
         builder: (context, child) {
           return ClipRect(
             child: Container(
+              padding: EdgeInsets.only(
+                top: MediaQuery.of(context).padding.top * 0.01,
+              ),
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.95),
                 boxShadow: [
