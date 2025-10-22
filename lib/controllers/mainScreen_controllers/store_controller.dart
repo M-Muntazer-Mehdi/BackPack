@@ -83,28 +83,71 @@ class StoreController extends GetxController {
       if (status == PermissionStatus.granted ||
           status == PermissionStatus.limited) {
         log(status.toString());
-        Position locationData = await Geolocator.getCurrentPosition();
-
-        latLng = LatLng(locationData.latitude, locationData.longitude);
+        
+        // Get map controller first
         final GoogleMapController controller = await mapController.future;
-        controller.animateCamera(
-          CameraUpdate.newCameraPosition(
-            CameraPosition(
-              target: latLng,
-              zoom: 10,
+        
+        // Immediately move camera to last known location with proper zoom
+        try {
+          Position lastKnown = await Geolocator.getLastKnownPosition() ?? 
+              await Geolocator.getCurrentPosition(
+                desiredAccuracy: LocationAccuracy.low,
+                timeLimit: const Duration(seconds: 1),
+              );
+          
+          latLng = LatLng(lastKnown.latitude, lastKnown.longitude);
+          
+          // Immediate camera animation with balanced zoom
+          controller.animateCamera(
+            CameraUpdate.newCameraPosition(
+              CameraPosition(
+                target: latLng,
+                zoom: 10.0,
+                tilt: 0,
+              ),
             ),
-          ),
-        );
+          );
+          
+          isLoading = false;
+          update();
+        } catch (e) {
+          log("Error getting last known position: $e");
+        }
+        
+        // Get precise current position in background and update
+        Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high,
+        ).then((Position locationData) {
+          latLng = LatLng(locationData.latitude, locationData.longitude);
+          
+          // Smoothly update to precise location if different
+          controller.animateCamera(
+            CameraUpdate.newCameraPosition(
+              CameraPosition(
+                target: latLng,
+                zoom: 10.0,
+                tilt: 0,
+              ),
+            ),
+          );
+          
+          update();
+          getDataStream();
+          
+          // Get address in background
+          LocationController.getAddressFromLatLng(
+            latLng.latitude,
+            latLng.longitude,
+          ).then((addr) {
+            location = addr;
+            print(location);
+            update();
+          });
+        });
+      } else {
+        isLoading = false;
+        update();
       }
-      location = await LocationController.getAddressFromLatLng(
-        latLng.latitude,
-        latLng.longitude,
-      );
-
-      print(location);
-      isLoading = false;
-      update();
-      getDataStream();
     } catch (e) {
       log(e.toString());
       // latLng = const LatLng(-36.9161458, 174.640739);
