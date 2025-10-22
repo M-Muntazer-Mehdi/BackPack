@@ -67,149 +67,65 @@ class ChatDetailScreenState extends State<ChatDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: AppColors.scaffoldBackgroundColor,
+        backgroundColor: AppColors.bgGrey,
         body: SafeArea(
             child: Stack(
           children: [
             Column(
               children: [
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          Get.back();
-                        },
-                        child: const Icon(
-                          Icons.arrow_back_ios,
-                          color: Colors.white,
-                        ),
-                      ),
-                      10.wp,
-                      Expanded(
-                        child: StreamBuilder<DocumentSnapshot<UserModel>>(
-                            stream: Database.getSingleUser(
-                                widget.chat.user1.id ==
-                                        Get.find<UserDetail>().userId
-                                    ? widget.chat.user2.id
-                                    : widget.chat.user1.id),
-                            builder: (context, snap) {
-                              GroupChatUser user = widget.chat.user1.id ==
-                                      Get.find<UserDetail>().userId
-                                  ? widget.chat.user2
-                                  : widget.chat.user1;
-                              String name = snap.hasData
-                                  ? '${snap.data?.data()?.fname ?? ""} ${snap.data?.data()?.lname ?? ''}'
-                                  : user.name;
-                              String image = snap.hasData
-                                  ? (snap.data?.data()?.image ?? '')
-                                  : '';
-                              return Container(
-                                decoration: const BoxDecoration(
-                                    border: Border(
-                                        bottom:
-                                            BorderSide(color: Colors.white10))),
-                                alignment: Alignment.center,
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 13),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Container(
-                                      margin: const EdgeInsets.only(
-                                        right: 10,
-                                      ),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(50),
-                                        child: NetworkImageCustom(
-                                            image: image,
-                                            fit: BoxFit.cover,
-                                            height: 40,
-                                            width: 40),
-                                      ),
-                                    ),
-                                    10.wp,
-                                    Expanded(
-                                        child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        Container(
-                                            alignment: Alignment.centerLeft,
-                                            child: Row(
-                                              children: [
-                                                Expanded(
-                                                    child: Text(
-                                                  name,
-                                                  style: subHeadingText(
-                                                      size: 16,
-                                                      color: Colors.white),
-                                                )),
-                                              ],
-                                            )),
-                                      ],
-                                    )),
-                                  ],
-                                ),
-                              );
-                            }),
-                      ),
-                      PopupMenuButton<String>(
-                        color: Colors.white,
-                        iconColor: Colors.white,
-                        itemBuilder: (context) {
-                          return [
-                            PopupMenuItem(
-                              child: const Text('Block'),
-                              onTap: () {
-                                final user = widget.chat.user1.id ==
-                                        Get.find<UserDetail>().userId
-                                    ? widget.chat.user2
-                                    : widget.chat.user1;
-                                Database.reportUser(
-                                  user.id,
-                                  docId: widget.chat.roomId,
-                                  myId: Get.find<UserDetail>().userId,
-                                ).then(
-                                  (value) {
-                                    if (value) {
-                                      EasyLoading.showToast(
-                                          'User has been blocked, you will not receive any message from it');
-                                      Get.back();
-                                    }
-                                  },
-                                );
-                              },
-                            ),
-                          ];
-                        },
-                      )
-                    ],
-                  ),
-                ),
+                // Premium Chat Header
+                _buildChatHeader(),
                 Expanded(child: messagesV2(context)),
               ],
             ),
             if (widget.chat.status == 'pending' &&
                 widget.chat.createdBy != Get.find<UserDetail>().userId)
               Positioned(
-                top: 100,
-                left: 15,
-                right: 15,
-                child: Row(
+                top: 80,
+                left: 20,
+                right: 20,
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(18),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primaryColor.withOpacity(0.12),
+                        blurRadius: 20,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.info_rounded,
+                            color: AppColors.primaryColor,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'New Connection Request',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.txtDark,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
                   children: [
                     Expanded(
-                        child: PrimaryButton(
-                      label: 'Accept',
-                      whiteButton: true,
-                      onPress: () {
+                            child: GestureDetector(
+                              onTap: () {
                         FirebaseFirestore.instance
                             .collection('chats')
                             .doc(widget.chat.roomId)
@@ -217,14 +133,46 @@ class ChatDetailScreenState extends State<ChatDetailScreen> {
                         widget.chat.status = 'accepted';
                         setState(() {});
                       },
-                      color: const Color(0xff83FF49),
-                    )),
-                    20.wp,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      Colors.green.shade400,
+                                      Colors.green.shade500,
+                                    ],
+                                  ),
+                                  borderRadius: BorderRadius.circular(12),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.green.withOpacity(0.3),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 3),
+                                    ),
+                                  ],
+                                ),
+                                child: const Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      'Accept',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
                     Expanded(
-                        child: PrimaryButton(
-                      label: 'Decline',
-                      whiteButton: true,
-                      onPress: () {
+                            child: GestureDetector(
+                              onTap: () {
                         FirebaseFirestore.instance
                             .collection('chats')
                             .doc(widget.chat.roomId)
@@ -232,9 +180,38 @@ class ChatDetailScreenState extends State<ChatDetailScreen> {
                         widget.chat.status = 'rejected';
                         setState(() {});
                       },
-                      color: const Color(0xffFF4949),
-                    )),
-                  ],
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                decoration: BoxDecoration(
+                                  color: AppColors.errorRed.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: AppColors.errorRed.withOpacity(0.3),
+                                    width: 1.5,
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.cancel_rounded, color: AppColors.errorRed, size: 20),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      'Decline',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w700,
+                                        color: AppColors.errorRed,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             // Recording overlay (locked state) - MUST be last to be on top
@@ -378,106 +355,149 @@ class ChatDetailScreenState extends State<ChatDetailScreen> {
   Column _textField(BuildContext context) {
     return Column(
       children: [
+        // Upload progress indicator
         GetBuilder<ChatDetailController>(builder: (value) {
           return Visibility(
             visible: value.loading || value.isUploadingVoice,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(2),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(2),
               child: LinearProgressIndicator(
                 value: value.isUploadingVoice ? value.uploadProgress : null,
-                color: Colors.grey.withOpacity(0.3),
+                  backgroundColor: Colors.transparent,
+                  valueColor: AlwaysStoppedAnimation(AppColors.primaryColor),
+                ),
               ),
             ),
           );
         }),
-        Row(
-          children: [
-            // Attachment button (like WhatsApp) - for documents
-            Container(
-              margin: const EdgeInsets.only(left: 5),
-              child: IconButton(
-                icon: Icon(
-                  Icons.attach_file,
-                  color: Colors.white70,
-                  size: 26,
-                ),
-                onPressed: () {
-                  controller.showAttachmentPicker(context);
-                },
+        // Input area
+        Container(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 12,
+                offset: const Offset(0, -3),
               ),
-            ),
-            // Text input field
-            Expanded(
-              child: Container(
-                height: ht(45),
-                margin: const EdgeInsets.symmetric(vertical: 10),
-                decoration: BoxDecoration(
-                    color: const Color(0xff383838).withOpacity(0.8),
-                    borderRadius: BorderRadius.circular(100)),
-                child: TextField(
-                  onTap: () => controller.disableEmoji(),
-                  onChanged: controller.changeText,
-                  textInputAction: TextInputAction.done,
-                  keyboardType: TextInputType.text,
-                  style: normalText(color: Colors.white),
-                  controller: controller.controllerMessage,
-                  textAlign: TextAlign.start,
-                  decoration: InputDecoration(
-                    prefixIconConstraints: const BoxConstraints(minWidth: 35),
-                    suffixIcon: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Camera icon inside text field
-                        IconButton(
-                          icon: const Icon(
-                            Icons.camera_alt,
-                            color: Colors.white70,
-                          ),
-                          onPressed: () {
-                            controller.showCameraOptions(context);
-                          },
-                        ),
-                      ],
-                    ),
-                    contentPadding: const EdgeInsets.only(top: 7, left: 15),
-                    focusedBorder: AppViews.textFieldRoundBorder(),
-                    border: AppViews.textFieldRoundBorder(),
-                    disabledBorder: AppViews.textFieldRoundBorder(),
-                    focusedErrorBorder: AppViews.textFieldRoundBorder(),
-                    hintText: "Type your message...",
-                    hintStyle: regularText(color: Colors.grey),
+            ],
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+              // Attachment button
+              GestureDetector(
+                onTap: () => controller.showAttachmentPicker(context),
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: AppColors.bgGrey,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    Icons.add_rounded,
+                    color: AppColors.primaryColor,
+                    size: 24,
                   ),
                 ),
               ),
-            ),
-            // Send or Mic button
-            GetBuilder<ChatDetailController>(builder: (value) {
-              // Show send button if there's text, otherwise show mic button
-              if (value.showSendButton) {
-                return Container(
-                  margin: const EdgeInsets.all(8),
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                      color: AppColors.primaryColor, shape: BoxShape.circle),
-                  child: InkWell(
-                    onTap: () {
-                      controller.sendMessage();
-                    },
-                    child: SizedBox(
-                      width: ht(45),
-                      height: ht(45),
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Icon(
-                          Icons.send,
-                          color: AppColors.colorWhite,
+              const SizedBox(width: 10),
+            // Text input field
+            Expanded(
+              child: Container(
+                  constraints: const BoxConstraints(minHeight: 44, maxHeight: 120),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                decoration: BoxDecoration(
+                    color: AppColors.bgGrey,
+                    borderRadius: BorderRadius.circular(22),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Expanded(
+                child: TextField(
+                  onTap: () => controller.disableEmoji(),
+                  onChanged: controller.changeText,
+                  controller: controller.controllerMessage,
+                          maxLines: null,
+                          textCapitalization: TextCapitalization.sentences,
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.txtDark,
+                            height: 1.4,
+                          ),
+                  decoration: InputDecoration(
+                            border: InputBorder.none,
+                            hintText: "Type a message...",
+                            hintStyle: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.txtGrey,
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                          ),
                         ),
                       ),
+                      // Camera button
+                      GestureDetector(
+                        onTap: () => controller.showCameraOptions(context),
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 8, bottom: 8),
+                          child: Icon(
+                            Icons.camera_alt_rounded,
+                            color: AppColors.primaryColor,
+                            size: 24,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+            // Send or Mic button
+            GetBuilder<ChatDetailController>(builder: (value) {
+              if (value.showSendButton) {
+                  return GestureDetector(
+                    onTap: () => controller.sendMessage(),
+                    child: Container(
+                      width: 44,
+                      height: 44,
+                  decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            AppColors.primaryColor,
+                            AppColors.primaryColor.withOpacity(0.85),
+                          ],
+                        ),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primaryColor.withOpacity(0.4),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.send_rounded,
+                        color: Colors.white,
+                        size: 20,
                     ),
                   ),
                 );
               } else {
-                // Voice recording button
                 return VoiceRecordingButton(
                   controller: controller.voiceRecordingController,
                   onSendVoiceMessage: controller.sendVoiceMessage,
@@ -485,29 +505,264 @@ class ChatDetailScreenState extends State<ChatDetailScreen> {
               }
             }),
           ],
+          ),
         ),
       ],
+    );
+  }
+
+  Widget _buildChatHeader() {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primaryColor.withOpacity(0.06),
+            blurRadius: 12,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // Back button
+          GestureDetector(
+            onTap: () => Get.back(),
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppColors.bgGrey,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                Icons.arrow_back_ios_new_rounded,
+                color: AppColors.txtDark,
+                size: 20,
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          // User info
+          Expanded(
+            child: StreamBuilder<DocumentSnapshot<UserModel>>(
+              stream: Database.getSingleUser(
+                widget.chat.user1.id == Get.find<UserDetail>().userId
+                    ? widget.chat.user2.id
+                    : widget.chat.user1.id
+              ),
+              builder: (context, snap) {
+                GroupChatUser user = widget.chat.user1.id == Get.find<UserDetail>().userId
+                    ? widget.chat.user2
+                    : widget.chat.user1;
+                String name = snap.hasData
+                    ? '${snap.data?.data()?.fname ?? ""} ${snap.data?.data()?.lname ?? ''}'
+                    : user.name;
+                String image = snap.hasData ? (snap.data?.data()?.image ?? '') : '';
+                
+                return Row(
+                  children: [
+                    // Avatar with gradient ring
+                    Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            AppColors.primaryColor.withOpacity(0.3),
+                            AppColors.primaryColor.withOpacity(0.1),
+                          ],
+                        ),
+                      ),
+                      padding: const EdgeInsets.all(2),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(22),
+                        child: NetworkImageCustom(
+                          image: image,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    // Name and status
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            name,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.txtDark,
+                              letterSpacing: -0.3,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 2),
+                          Row(
+                            children: [
+                              Container(
+                                width: 8,
+                                height: 8,
+                                decoration: BoxDecoration(
+                                  color: Colors.green.shade400,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                'Online',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.green.shade600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+          // Menu button
+          PopupMenuButton<String>(
+            icon: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppColors.bgGrey,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                Icons.more_vert_rounded,
+                color: AppColors.txtDark,
+                size: 20,
+              ),
+            ),
+            color: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            itemBuilder: (context) {
+              return [
+                PopupMenuItem(
+                  child: Row(
+                    children: [
+                      Icon(Icons.block_rounded, color: AppColors.errorRed, size: 20),
+                      const SizedBox(width: 12),
+                      const Text('Block User'),
+                    ],
+                  ),
+                  onTap: () {
+                    final user = widget.chat.user1.id == Get.find<UserDetail>().userId
+                        ? widget.chat.user2
+                        : widget.chat.user1;
+                    Database.reportUser(
+                      user.id,
+                      docId: widget.chat.roomId,
+                      myId: Get.find<UserDetail>().userId,
+                    ).then((value) {
+                      if (value) {
+                        EasyLoading.showToast(
+                          'User has been blocked, you will not receive any message from it'
+                        );
+                        Get.back();
+                      }
+                    });
+                  },
+                ),
+              ];
+            },
+          ),
+        ],
+      ),
     );
   }
 
   Stack messagesV2(BuildContext context) {
     return Stack(
       children: [
-        Column(
+        // Chat background with subtle pattern
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.bgGrey,
+            image: DecorationImage(
+              image: const AssetImage('assets/images/chat_pattern.png'),
+              fit: BoxFit.cover,
+              opacity: 0.03,
+              onError: (exception, stackTrace) {
+                // If pattern image doesn't exist, just use solid color
+              },
+            ),
+          ),
+          child: Column(
           children: [
             Expanded(
               child: StreamBuilder<QuerySnapshot>(
                   stream: stream,
                   builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                     if (snapshot.hasError) {
-                      return const Text('Something went wrong');
+                        return Center(
+                          child: Text(
+                            'Something went wrong',
+                            style: TextStyle(
+                              color: AppColors.txtGrey,
+                              fontSize: 14,
+                            ),
+                          ),
+                        );
                     }
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const SizedBox();
+                        return Center(
+                          child: CircularProgressIndicator(
+                            color: AppColors.primaryColor,
+                          ),
+                        );
+                      }
+
+                      if (snapshot.data!.docs.isEmpty) {
+                        return Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.chat_bubble_outline_rounded,
+                                size: 60,
+                                color: AppColors.txtGrey.withOpacity(0.5),
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                'No messages yet',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.txtGrey,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Start the conversation!',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: AppColors.txtGrey.withOpacity(0.7),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
                     }
 
                     return ListView.builder(
-                      padding: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                       reverse: true,
                       itemCount: snapshot.data!.docs.length,
                       itemBuilder: (BuildContext contextM, index) {
@@ -562,6 +817,7 @@ class ChatDetailScreenState extends State<ChatDetailScreen> {
               );
             })
           ],
+          ),
         ),
         if (widget.chat.status != 'accepted' &&
             widget.chat.createdBy == Get.find<UserDetail>().userId) ...[
@@ -571,12 +827,44 @@ class ChatDetailScreenState extends State<ChatDetailScreen> {
                 flex: 1,
                 child: Container(),
               ),
-              Text(
-                'You will be able to message when your request is accepted',
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 20),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 16,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.schedule_rounded,
+                      color: AppColors.warningYellow,
+                      size: 24,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Waiting for response...\nYou can message when accepted',
                 textAlign: TextAlign.center,
-                style: regularText(color: Colors.white),
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.txtDark,
+                          height: 1.4,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              20.hp,
+              const SizedBox(height: 20),
             ],
           ),
         ],

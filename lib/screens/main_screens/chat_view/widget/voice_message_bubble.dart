@@ -32,20 +32,31 @@ class VoiceMessageBubble extends StatelessWidget {
       alignment: isSender ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
         margin: EdgeInsets.only(
-          top: 5,
-          bottom: 5,
+          top: 4,
+          bottom: 4,
           left: isSender ? 60 : 10,
           right: isSender ? 10 : 60,
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
-          color: isSender ? AppColors.primaryColor : const Color(0xff383838),
+          color: isSender 
+              ? AppColors.primaryColor.withOpacity(0.9)
+              : Colors.white,
           borderRadius: BorderRadius.only(
-            topLeft: const Radius.circular(15),
-            topRight: const Radius.circular(15),
-            bottomLeft: Radius.circular(isSender ? 15 : 0),
-            bottomRight: Radius.circular(isSender ? 0 : 15),
+            topLeft: const Radius.circular(20),
+            topRight: const Radius.circular(20),
+            bottomLeft: Radius.circular(isSender ? 20 : 0),
+            bottomRight: Radius.circular(isSender ? 0 : 20),
           ),
+          boxShadow: [
+            BoxShadow(
+              color: isSender 
+                  ? AppColors.primaryColor.withOpacity(0.25)
+                  : Colors.black.withOpacity(0.06),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -67,16 +78,18 @@ class VoiceMessageBubble extends StatelessWidget {
                 Text(
                   AudioUtils.formatFileSize(fileSize),
                   style: TextStyle(
-                    fontSize: 10,
-                    color: isSender ? Colors.white70 : Colors.grey[500],
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: isSender ? Colors.white.withOpacity(0.85) : AppColors.txtGrey,
                   ),
                 ),
                 const SizedBox(width: 8),
                 Text(
                   _formatTime(time),
                   style: TextStyle(
-                    fontSize: 10,
-                    color: isSender ? Colors.white70 : Colors.grey[500],
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: isSender ? Colors.white.withOpacity(0.85) : AppColors.txtGrey,
                   ),
                 ),
               ],

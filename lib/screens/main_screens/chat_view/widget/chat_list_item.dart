@@ -83,7 +83,7 @@ class ChatListItem extends StatelessWidget {
           children: [
             Expanded(
                 child: Container(
-              margin: const EdgeInsets.only(right: 80),
+              margin: const EdgeInsets.only(right: 60),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -103,33 +103,46 @@ class ChatListItem extends StatelessWidget {
                       : const SizedBox.shrink(),
                   Container(
                       decoration: BoxDecoration(
-                        color: Colors.grey.withOpacity(0.2),
+                        color: Colors.white,
                         borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(30),
-                          topRight: Radius.circular(30),
-                          bottomRight: Radius.circular(30),
+                          topLeft: Radius.circular(20),
+                          topRight: Radius.circular(20),
+                          bottomRight: Radius.circular(20),
                         ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.06),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
-                      padding: const EdgeInsets.all(15),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           showImages(context),
-                          Text(
-                            mChatModel.message,
-                            style: regularText(size: 16)
-                                .copyWith(color: Colors.white),
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
+                          if (mChatModel.message.isNotEmpty)
+                            Text(
+                              mChatModel.message,
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.txtDark,
+                                height: 1.4,
+                              ),
+                            ),
+                          const SizedBox(height: 6),
                           Text(
                             timeago.format(mChatModel.time.toDate(),
                                 locale: 'en_short'),
-                            style: regularText(size: 10)
-                                .copyWith(color: Colors.grey),
-                          )
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.txtGrey,
+                            ),
+                          ),
                         ],
                       )),
                 ],
@@ -145,7 +158,7 @@ class ChatListItem extends StatelessWidget {
           children: [
             Expanded(
                 child: Container(
-              margin: const EdgeInsets.only(left: 80),
+              margin: const EdgeInsets.only(left: 60),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -166,7 +179,7 @@ class ChatListItem extends StatelessWidget {
                       : const SizedBox.shrink(),
                   Container(
                       decoration: BoxDecoration(
-                        color: AppColors.primaryColor.withOpacity(0.3),
+                        color: AppColors.primaryColor.withOpacity(0.9),
                         borderRadius: const BorderRadius.only(
                           topLeft: Radius.circular(30),
                           topRight: Radius.circular(30),
@@ -205,7 +218,7 @@ class ChatListItem extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      margin: const EdgeInsets.all(5),
+      margin: const EdgeInsets.symmetric(vertical: 4),
       child: mWidget,
     );
   }

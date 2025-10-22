@@ -885,7 +885,7 @@ class _BuddiesState extends State<Buddies> with TickerProviderStateMixin {
     final isBlocked = userModel?.reportedUsers.contains(myId) ?? false;
     final isApproved = userModel?.approved ?? false;
     
-    return Container(
+  return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -904,7 +904,7 @@ class _BuddiesState extends State<Buddies> with TickerProviderStateMixin {
           ),
         ],
       ),
-      child: Column(
+    child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Compact header with photo and info side by side
@@ -912,10 +912,10 @@ class _BuddiesState extends State<Buddies> with TickerProviderStateMixin {
             padding: const EdgeInsets.all(14),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+      children: [
                 // Profile photo
                 Stack(
-                  children: [
+              children: [
                     Container(
                       width: 90,
                       height: 110,
@@ -930,14 +930,14 @@ class _BuddiesState extends State<Buddies> with TickerProviderStateMixin {
                           ],
                         ),
                       ),
-                      child: ClipRRect(
+                  child: ClipRRect(
                         borderRadius: BorderRadius.circular(16),
-                        child: NetworkImageCustom(
-                          image: userModel?.image,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
+                    child: NetworkImageCustom(
+                      image: userModel?.image,
+                      fit: BoxFit.cover,
                     ),
+                  ),
+                ),
                     // Verification badge on photo
                     if (isApproved)
                       Positioned(
@@ -961,11 +961,11 @@ class _BuddiesState extends State<Buddies> with TickerProviderStateMixin {
                             Icons.check,
                             color: Colors.white,
                             size: 12,
-                          ),
-                        ),
-                      ),
-                  ],
+                    ),
+                  ),
                 ),
+              ],
+            ),
                 const SizedBox(width: 14),
                 // Info section
                 Expanded(
@@ -1069,7 +1069,7 @@ class _BuddiesState extends State<Buddies> with TickerProviderStateMixin {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 14),
             child: Container(
-              height: 1,
+          height: 1,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
@@ -1117,7 +1117,7 @@ class _BuddiesState extends State<Buddies> with TickerProviderStateMixin {
             ),
             const SizedBox(width: 8),
             Text(
-              'Blocked',
+                'Blocked',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
@@ -1178,7 +1178,7 @@ class _BuddiesState extends State<Buddies> with TickerProviderStateMixin {
         isDisabled = true;
         break;
       case 'accepted':
-        label = 'Chat Now';
+                      label = 'Chat Now';
         bgColor = AppColors.successGreen.withOpacity(0.1);
         textColor = AppColors.successGreen;
         icon = Icons.chat_bubble_rounded;
@@ -1250,17 +1250,17 @@ class _BuddiesState extends State<Buddies> with TickerProviderStateMixin {
   Widget _buildConnectButton(UserModel? userModel) {
     return GestureDetector(
       onTap: () async {
-        EasyLoading.show();
+                      EasyLoading.show();
         await FireDatabase.createChatRoom(userModel!).then((id) async {
-          if (id != 'null') {
-            var chatGroupModel = await Database.getSingleChat(id);
-            if (chatGroupModel.exists) {
+                        if (id != 'null') {
+                          var chatGroupModel = await Database.getSingleChat(id);
+                          if (chatGroupModel.exists) {
               Get.to(() => ChatDetailScreen(chat: chatGroupModel.data()!));
-            }
-          }
-        });
-        EasyLoading.dismiss();
-      },
+                          }
+                        }
+                      });
+                      EasyLoading.dismiss();
+                    },
       child: Container(
         width: double.infinity,
         height: 44,

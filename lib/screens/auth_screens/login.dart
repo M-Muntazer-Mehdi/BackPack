@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:back_packers/controllers/auth_controllers/login_controller.dart';
 import 'package:back_packers/globals/adaptive_helper.dart';
@@ -40,6 +41,15 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
   @override
   void initState() {
     super.initState();
+    
+    // Set status bar style
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light,
+      ),
+    );
     
     // Clear errors when user starts typing
     controller.controllerEmail.addListener(() {
@@ -155,6 +165,15 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
   @override
   void dispose() {
+    // Reset status bar to default
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light,
+      ),
+    );
+    
     _fadeController.dispose();
     _slideController.dispose();
     _floatController.dispose();
@@ -193,6 +212,8 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      resizeToAvoidBottomInset: true,
+      extendBodyBehindAppBar: true,
       body: Stack(
           children: [
           // Clean gradient background
@@ -215,305 +236,313 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
           ..._buildMinimalDecoration(),
           
           // Main content
-          SafeArea(
-                child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: AnimatedBuilder(
+          SingleChildScrollView(
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top,
+              left: 24,
+              right: 24,
+            ),
+            child: AnimatedBuilder(
                 animation: Listenable.merge([_fadeController, _slideController]),
                 builder: (context, child) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: ht(30)),
-                      
-                      // Logo with particle effects
-                      FadeTransition(
-                        opacity: _fadeAnimation,
-                        child: Transform.translate(
-                          offset: Offset(0, _logoSlideAnimation.value),
-                          child: _buildAnimatedLogo(),
-                        ),
-                      ),
-                      
-                      SizedBox(height: ht(24)),
-                      
-                      // Welcome text with better animation
-                      FadeTransition(
-                        opacity: _fadeAnimation,
-                        child: Transform.translate(
-                          offset: Offset(0, _logoSlideAnimation.value),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              ShaderMask(
-                                shaderCallback: (bounds) => LinearGradient(
-                                  colors: [
-                                    AppColors.primaryColor,
-                                    AppColors.primaryDark,
-                                  ],
-                                ).createShader(bounds),
-                                child: const Text(
-                                  'Welcome Back',
-                                  style: TextStyle(
-                                    fontSize: 32,
-                                    fontWeight: FontWeight.w900,
-                                    color: Colors.white,
-                                    letterSpacing: -1,
-                                    height: 1.1,
-                                  ),
-                                ),
-                              ),
-                              
-                              SizedBox(height: ht(8)),
-                              
-                    Text(
-                                'Sign in to continue your adventure',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                  color: AppColors.txtGrey,
-                                  letterSpacing: 0.2,
-                                ),
-                              ),
-                            ],
+                  return ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top - MediaQuery.of(context).padding.bottom,
+                    ),
+                    child: IntrinsicHeight(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(height: ht(30)),
+                          
+                          // Logo with particle effects
+                          FadeTransition(
+                            opacity: _fadeAnimation,
+                            child: Transform.translate(
+                              offset: Offset(0, _logoSlideAnimation.value),
+                              child: _buildAnimatedLogo(),
+                            ),
                           ),
-                        ),
-                      ),
-                      
-                      const Spacer(),
-                      
-                      // Form section with stagger
-                      FadeTransition(
-                        opacity: _fadeAnimation,
-                        child: Transform.translate(
-                          offset: Offset(0, _formSlideAnimation.value),
-                          child: GetBuilder<LoginController>(
-                            builder: (value) {
-                              return Column(
+                          
+                          SizedBox(height: ht(24)),
+                          
+                          // Welcome text with better animation
+                          FadeTransition(
+                            opacity: _fadeAnimation,
+                            child: Transform.translate(
+                              offset: Offset(0, _logoSlideAnimation.value),
+                              child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  // Email field with animation
-                                  _buildPremiumTextField(
-                                    controller: controller.controllerEmail,
-                                    focusNode: controller.focusNodeEmail,
-                                    label: 'Email Address',
-                                    hint: 'your.email@example.com',
-                                    prefixIcon: Icons.email_outlined,
-                                    keyboardType: TextInputType.emailAddress,
-                                    isFocused: _emailFocused,
-                                    errorText: _emailError,
+                                  ShaderMask(
+                                    shaderCallback: (bounds) => LinearGradient(
+                                      colors: [
+                                        AppColors.primaryColor,
+                                        AppColors.primaryDark,
+                                      ],
+                                    ).createShader(bounds),
+                                    child: const Text(
+                                      'Welcome Back',
+                                      style: TextStyle(
+                                        fontSize: 32,
+                                        fontWeight: FontWeight.w900,
+                                        color: Colors.white,
+                                        letterSpacing: -1,
+                                        height: 1.1,
+                                      ),
+                                    ),
                                   ),
                                   
-                                  SizedBox(height: ht(18)),
+                                  SizedBox(height: ht(8)),
                                   
-                                  // Password field with animation
-                                  _buildPremiumTextField(
-                                    controller: controller.controllerPassword,
-                                    focusNode: controller.focusNodePassword,
-                                    label: 'Password',
-                                    hint: '••••••••',
-                                    prefixIcon: Icons.lock_outline_rounded,
-                                    obscureText: controller.obscure,
-                                    isFocused: _passwordFocused,
-                                    errorText: _passwordError,
-                                    suffixIcon: IconButton(
-                                      onPressed: () {
-                                        controller.obscure = !controller.obscure;
-                                        controller.update();
-                                      },
-                                      icon: Icon(
-                                        controller.obscure 
-                                          ? Icons.visibility_outlined 
-                                          : Icons.visibility_off_outlined,
-                                        color: AppColors.iconColor,
-                                        size: 22,
+                    Text(
+                                    'Sign in to continue your adventure',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w400,
+                                      color: AppColors.txtGrey,
+                                      letterSpacing: 0.2,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          
+                          SizedBox(height: MediaQuery.of(context).size.height * 0.08),
+                      
+                          // Form section with stagger
+                          FadeTransition(
+                            opacity: _fadeAnimation,
+                            child: Transform.translate(
+                              offset: Offset(0, _formSlideAnimation.value),
+                              child: GetBuilder<LoginController>(
+                                builder: (value) {
+                                  return Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      // Email field with animation
+                                      _buildPremiumTextField(
+                                        controller: controller.controllerEmail,
+                                        focusNode: controller.focusNodeEmail,
+                                        label: 'Email Address',
+                                        hint: 'your.email@example.com',
+                                        prefixIcon: Icons.email_outlined,
+                                        keyboardType: TextInputType.emailAddress,
+                                        isFocused: _emailFocused,
+                                        errorText: _emailError,
+                                      ),
+                                      
+                                      SizedBox(height: ht(18)),
+                                      
+                                      // Password field with animation
+                                      _buildPremiumTextField(
+                                        controller: controller.controllerPassword,
+                                        focusNode: controller.focusNodePassword,
+                                        label: 'Password',
+                                        hint: '••••••••',
+                                        prefixIcon: Icons.lock_outline_rounded,
+                                        obscureText: controller.obscure,
+                                        isFocused: _passwordFocused,
+                                        errorText: _passwordError,
+                                        suffixIcon: IconButton(
+                                          onPressed: () {
+                                            controller.obscure = !controller.obscure;
+                                            controller.update();
+                                          },
+                                          icon: Icon(
+                                            controller.obscure 
+                                              ? Icons.visibility_outlined 
+                                              : Icons.visibility_off_outlined,
+                                            color: AppColors.iconColor,
+                                            size: 22,
                 ),
               ),
             ),
-                                  
-                                  SizedBox(height: ht(14)),
-                                  
-                                  // Remember me and forgot password
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      // Remember me
-                                      InkWell(
-                                        onTap: () => controller.rememberMe(!value.isRememberMe),
-                                        borderRadius: BorderRadius.circular(8),
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
-                                          child: Row(
+                                      
+                                      SizedBox(height: ht(14)),
+                                      
+                                      // Remember me and forgot password
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          // Remember me
+                                          InkWell(
+                                            onTap: () => controller.rememberMe(!value.isRememberMe),
+                                            borderRadius: BorderRadius.circular(8),
+                                            child: Padding(
+                                              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+                                              child: Row(
                 children: [
-                                              AnimatedContainer(
-                                                duration: const Duration(milliseconds: 200),
-                                                width: 22,
-                                                height: 22,
-                                                decoration: BoxDecoration(
-                                                  gradient: value.isRememberMe 
-                                                    ? AppColors.primaryGradient 
-                                                    : null,
-                                                  color: value.isRememberMe 
-                                                    ? null 
-                                                    : AppColors.bgGrey,
-                                                  borderRadius: BorderRadius.circular(6),
-                                                  border: Border.all(
-                                                    color: value.isRememberMe 
-                                                      ? Colors.transparent 
-                                                      : AppColors.borderColor,
-                                                    width: 2,
+                                                  AnimatedContainer(
+                                                    duration: const Duration(milliseconds: 200),
+                                                    width: 22,
+                                                    height: 22,
+                                                    decoration: BoxDecoration(
+                                                      gradient: value.isRememberMe 
+                                                        ? AppColors.primaryGradient 
+                                                        : null,
+                                                      color: value.isRememberMe 
+                                                        ? null 
+                                                        : AppColors.bgGrey,
+                                                      borderRadius: BorderRadius.circular(6),
+                                                      border: Border.all(
+                                                        color: value.isRememberMe 
+                                                          ? Colors.transparent 
+                                                          : AppColors.borderColor,
+                                                        width: 2,
+                                                      ),
+                                                    ),
+                                                    child: value.isRememberMe
+                                                      ? const Icon(
+                                                          Icons.check_rounded,
+                                                          size: 16,
+                                                          color: Colors.white,
+                                                        )
+                                                      : null,
                                                   ),
-                                                ),
-                                                child: value.isRememberMe
-                                                  ? const Icon(
-                                                      Icons.check_rounded,
-                                                      size: 16,
-                                                      color: Colors.white,
-                                                    )
-                                                  : null,
-                                              ),
-                                              const SizedBox(width: 10),
+                                                  const SizedBox(width: 10),
                   Text(
-                                                'Remember me',
+                                                    'Remember me',
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight: FontWeight.w500,
+                                                      color: AppColors.txtGrey,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                          
+                                          // Forgot password
+                                          TextButton(
+                                            onPressed: () => Get.to(() => const ForgetPassword()),
+                                            style: TextButton.styleFrom(
+                                              foregroundColor: AppColors.primaryColor,
+                                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                            ),
+                                            child: const Text(
+                                              'Forgot Password?',
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      
+                                      SizedBox(height: ht(20)),
+                                      
+                                      // Sign in button with shimmer
+                                      _buildShimmerButton(),
+                                      
+                                      SizedBox(height: ht(20)),
+                                      
+                                      // Divider with "OR"
+                                      Row(
+                      children: [
+                                          Expanded(
+                                            child: Container(
+                                              height: 1,
+                                              decoration: BoxDecoration(
+                                                gradient: LinearGradient(
+                                                  colors: [
+                                                    Colors.transparent,
+                                                    AppColors.borderColor,
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                                            child: Text(
+                                              'OR',
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w700,
+                                                color: AppColors.txtMuted,
+                                                letterSpacing: 1,
+                                              ),
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: Container(
+                                              height: 1,
+                                              decoration: BoxDecoration(
+                                                gradient: LinearGradient(
+                                                  colors: [
+                                                    AppColors.borderColor,
+                                                    Colors.transparent,
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      
+                                      SizedBox(height: ht(20)),
+                                      
+                                      // Sign up prompt with better styling
+                                      Center(
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                          decoration: BoxDecoration(
+                                            color: AppColors.bgGrey,
+                                            borderRadius: BorderRadius.circular(16),
+                                            border: Border.all(
+                                              color: AppColors.borderColor,
+                                              width: 1,
+                                            ),
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Text(
+                                                'Don\'t have an account?',
                                                 style: TextStyle(
                                                   fontSize: 14,
-                                                  fontWeight: FontWeight.w500,
                                                   color: AppColors.txtGrey,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 6),
+                                              GestureDetector(
+                                                onTap: () {
+                              Get.to(() => const SignUpScreen());
+                            },
+                                                child: Text(
+                                                  'Sign Up',
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w700,
+                                                    color: AppColors.primaryColor,
+                                                  ),
                                                 ),
                                               ),
                                             ],
                                           ),
                                         ),
                                       ),
-                                      
-                                      // Forgot password
-                                      TextButton(
-                                        onPressed: () => Get.to(() => const ForgetPassword()),
-                                        style: TextButton.styleFrom(
-                                          foregroundColor: AppColors.primaryColor,
-                                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                        ),
-                                        child: const Text(
-                                          'Forgot Password?',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      ),
                                     ],
-                                  ),
-                                  
-                                  SizedBox(height: ht(20)),
-                                  
-                                  // Sign in button with shimmer
-                                  _buildShimmerButton(),
-                                  
-                                  SizedBox(height: ht(20)),
-                                  
-                                  // Divider with "OR"
-                                  Row(
-                      children: [
-                                      Expanded(
-                                        child: Container(
-                                          height: 1,
-                                          decoration: BoxDecoration(
-                                            gradient: LinearGradient(
-                                              colors: [
-                                                Colors.transparent,
-                                                AppColors.borderColor,
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                                        child: Text(
-                                          'OR',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w700,
-                                            color: AppColors.txtMuted,
-                                            letterSpacing: 1,
-                                          ),
-                                        ),
-                                      ),
-                                      Expanded(
-                                        child: Container(
-                                          height: 1,
-                                          decoration: BoxDecoration(
-                                            gradient: LinearGradient(
-                                              colors: [
-                                                AppColors.borderColor,
-                                                Colors.transparent,
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  
-                                  SizedBox(height: ht(20)),
-                                  
-                                  // Sign up prompt with better styling
-                                  Center(
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                          decoration: BoxDecoration(
-                                        color: AppColors.bgGrey,
-                                        borderRadius: BorderRadius.circular(16),
-                                        border: Border.all(
-                                          color: AppColors.borderColor,
-                                          width: 1,
-                                        ),
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text(
-                                            'Don\'t have an account?',
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              color: AppColors.txtGrey,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 6),
-                                          GestureDetector(
-                                            onTap: () {
-                              Get.to(() => const SignUpScreen());
-                            },
-                                            child: Text(
-                                              'Sign Up',
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w700,
-                                                color: AppColors.primaryColor,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              );
-                            },
+                                  );
+                                },
+                              ),
+                            ),
                           ),
-                        ),
+                          
+                          SizedBox(height: MediaQuery.of(context).size.height * 0.04),
+                        ],
                       ),
-                      
-                      const Spacer(),
-                      SizedBox(height: ht(24)),
-                    ],
+                    ),
                   );
                 },
               ),
-              ),
             ),
-          ],
+        ],
       ),
     );
   }
@@ -543,10 +572,10 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                         color: AppColors.primaryColor.withOpacity(0.5),
                         blurRadius: 8,
                         spreadRadius: 2,
-                      ),
-                    ],
-                  ),
-                ),
+            ),
+          ],
+        ),
+      ),
               );
             }),
             

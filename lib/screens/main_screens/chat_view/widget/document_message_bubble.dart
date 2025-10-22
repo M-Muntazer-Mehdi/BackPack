@@ -169,22 +169,31 @@ class DocumentMessageBubble extends StatelessWidget {
         child: Container(
           constraints: const BoxConstraints(maxWidth: 280),
           margin: EdgeInsets.only(
-            top: 5,
-            bottom: 5,
+            top: 4,
+            bottom: 4,
             left: isSender ? 60 : 10,
             right: isSender ? 10 : 60,
           ),
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             color: isSender 
-                ? AppColors.primaryColor.withOpacity(0.3) 
-                : const Color(0xff383838),
+                ? AppColors.primaryColor.withOpacity(0.9)
+                : Colors.white,
             borderRadius: BorderRadius.only(
-              topLeft: const Radius.circular(15),
-              topRight: const Radius.circular(15),
-              bottomLeft: Radius.circular(isSender ? 15 : 0),
-              bottomRight: Radius.circular(isSender ? 0 : 15),
+              topLeft: const Radius.circular(20),
+              topRight: const Radius.circular(20),
+              bottomLeft: Radius.circular(isSender ? 20 : 0),
+              bottomRight: Radius.circular(isSender ? 0 : 20),
             ),
+            boxShadow: [
+              BoxShadow(
+                color: isSender 
+                    ? AppColors.primaryColor.withOpacity(0.25)
+                    : Colors.black.withOpacity(0.06),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -219,7 +228,7 @@ class DocumentMessageBubble extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: isSender ? Colors.white : Colors.white,
+                            color: isSender ? Colors.white : AppColors.txtDark,
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -231,7 +240,7 @@ class DocumentMessageBubble extends StatelessWidget {
                               FileUtils.getFileTypeName(fileExtension),
                               style: TextStyle(
                                 fontSize: 11,
-                                color: isSender ? Colors.white70 : Colors.grey[400],
+                                color: isSender ? Colors.white.withOpacity(0.85) : AppColors.txtGrey,
                               ),
                             ),
                             const Text(' • ', style: TextStyle(color: Colors.grey)),
@@ -239,7 +248,7 @@ class DocumentMessageBubble extends StatelessWidget {
                               AudioUtils.formatFileSize(fileSize),
                               style: TextStyle(
                                 fontSize: 11,
-                                color: isSender ? Colors.white70 : Colors.grey[400],
+                                color: isSender ? Colors.white.withOpacity(0.85) : AppColors.txtGrey,
                               ),
                             ),
                           ],
@@ -250,7 +259,7 @@ class DocumentMessageBubble extends StatelessWidget {
                   // Download icon
                   Icon(
                     Icons.download,
-                    color: isSender ? Colors.white70 : Colors.grey[400],
+                    color: isSender ? Colors.white.withOpacity(0.85) : AppColors.txtGrey,
                     size: 20,
                   ),
                 ],
@@ -261,7 +270,7 @@ class DocumentMessageBubble extends StatelessWidget {
                 _formatTime(time),
                 style: TextStyle(
                   fontSize: 10,
-                  color: isSender ? Colors.white60 : Colors.grey[500],
+                  color: isSender ? Colors.white.withOpacity(0.85) : AppColors.txtGrey,
                 ),
               ),
             ],

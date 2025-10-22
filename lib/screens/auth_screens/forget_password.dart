@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:back_packers/controllers/auth_controllers/sign_up_controller.dart';
 import 'package:back_packers/globals/adaptive_helper.dart';
@@ -33,6 +34,15 @@ class _ForgetPasswordState extends State<ForgetPassword> with TickerProviderStat
   @override
   void initState() {
     super.initState();
+    
+    // Set status bar style
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light,
+      ),
+    );
     
     // Fade animation
     _fadeController = AnimationController(
@@ -121,6 +131,15 @@ class _ForgetPasswordState extends State<ForgetPassword> with TickerProviderStat
 
   @override
   void dispose() {
+    // Reset status bar to default
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light,
+      ),
+    );
+    
     _fadeController.dispose();
     _slideController.dispose();
     _floatController.dispose();
@@ -134,6 +153,8 @@ class _ForgetPasswordState extends State<ForgetPassword> with TickerProviderStat
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      resizeToAvoidBottomInset: true,
+      extendBodyBehindAppBar: true,
       body: Stack(
           children: [
           // Clean gradient background
@@ -156,16 +177,24 @@ class _ForgetPasswordState extends State<ForgetPassword> with TickerProviderStat
           ..._buildMinimalDecoration(),
           
           // Main content
-          SafeArea(
-                child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: AnimatedBuilder(
-                animation: Listenable.merge([_fadeController, _slideController]),
-                builder: (context, child) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: ht(20)),
+          SingleChildScrollView(
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top,
+              left: 24,
+              right: 24,
+            ),
+            child: AnimatedBuilder(
+              animation: Listenable.merge([_fadeController, _slideController]),
+              builder: (context, child) {
+                return ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top - MediaQuery.of(context).padding.bottom,
+                  ),
+                  child: IntrinsicHeight(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: ht(20)),
                       
                       // Back button
                       FadeTransition(
@@ -185,9 +214,9 @@ class _ForgetPasswordState extends State<ForgetPassword> with TickerProviderStat
                             child: Icon(
                               Icons.arrow_back_rounded,
                               color: AppColors.txtDark,
-                              size: 24,
-                            ),
-                          ),
+                        size: 24,
+                      ),
+                    ),
                         ),
                       ),
                       
@@ -209,8 +238,8 @@ class _ForgetPasswordState extends State<ForgetPassword> with TickerProviderStat
                         opacity: _fadeAnimation,
                         child: Transform.translate(
                           offset: Offset(0, _slideAnimation.value),
-                          child: Column(
-                            children: [
+              child: Column(
+                children: [
                               ShaderMask(
                                 shaderCallback: (bounds) => LinearGradient(
                                   colors: [
@@ -220,7 +249,7 @@ class _ForgetPasswordState extends State<ForgetPassword> with TickerProviderStat
                                 ).createShader(bounds),
                                 child: const Text(
                                   'Forgot Password?',
-                                  textAlign: TextAlign.center,
+                    textAlign: TextAlign.center,
                                   style: TextStyle(
                                     fontSize: 32,
                                     fontWeight: FontWeight.w900,
@@ -233,9 +262,9 @@ class _ForgetPasswordState extends State<ForgetPassword> with TickerProviderStat
                               
                               SizedBox(height: ht(16)),
                               
-                    Text(
+                  Text(
                                 'Don\'t worry! Enter your email address\nand we\'ll send you a reset link',
-                      textAlign: TextAlign.center,
+                    textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w400,
@@ -248,7 +277,7 @@ class _ForgetPasswordState extends State<ForgetPassword> with TickerProviderStat
                         ),
                       ),
                       
-                      const Spacer(),
+                        SizedBox(height: MediaQuery.of(context).size.height * 0.08),
                       
                       // Email input
                       FadeTransition(
@@ -257,9 +286,9 @@ class _ForgetPasswordState extends State<ForgetPassword> with TickerProviderStat
                           offset: Offset(0, _slideAnimation.value * 0.5),
                           child: GetBuilder<SignUpController>(
                             builder: (value) {
-                              return Column(
+                    return Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
+                      children: [
                                   Text(
                                     'Email Address',
                                     style: TextStyle(
@@ -317,9 +346,9 @@ class _ForgetPasswordState extends State<ForgetPassword> with TickerProviderStat
                                         contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
                                       ),
                                     ),
-                                  ),
-                                ],
-                              );
+                        ),
+                      ],
+                    );
                             },
                           ),
                         ),
@@ -356,20 +385,20 @@ class _ForgetPasswordState extends State<ForgetPassword> with TickerProviderStat
                                     fontSize: 15,
                                     fontWeight: FontWeight.w600,
                                     color: AppColors.primaryColor,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+              ),
+            ),
+          ],
+        ),
+      ),
                         ),
                       ),
                       
-                      const Spacer(),
-                      SizedBox(height: ht(24)),
-                    ],
-                  );
-                },
-              ),
+                        SizedBox(height: MediaQuery.of(context).size.height * 0.04),
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
           ),
         ],
@@ -464,7 +493,7 @@ class _ForgetPasswordState extends State<ForgetPassword> with TickerProviderStat
             ],
           ),
           child: Stack(
-                      children: [
+      children: [
               // Shimmer effect
               Positioned.fill(
                 child: ClipRRect(
@@ -497,7 +526,7 @@ class _ForgetPasswordState extends State<ForgetPassword> with TickerProviderStat
                   borderRadius: BorderRadius.circular(16),
                   splashColor: Colors.white.withOpacity(0.2),
                   highlightColor: Colors.white.withOpacity(0.1),
-                  child: Center(
+              child: Center(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: const [

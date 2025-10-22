@@ -257,10 +257,10 @@ class _NewPasswordState extends State<NewPassword> with TickerProviderStateMixin
                   
                   // Scrollable content
                   Expanded(
-                    child: ListView(
+        child: ListView(
                       physics: const BouncingScrollPhysics(),
                       padding: const EdgeInsets.symmetric(horizontal: 20),
-                      children: [
+          children: [
                         const SizedBox(height: 20),
                         
                         // Lock icon section
@@ -467,9 +467,9 @@ class _NewPasswordState extends State<NewPassword> with TickerProviderStateMixin
               fontWeight: FontWeight.w700,
               color: AppColors.txtDark,
               letterSpacing: 0.3,
+                ),
+              ),
             ),
-          ),
-        ),
         Container(
           decoration: BoxDecoration(
             color: Colors.white,

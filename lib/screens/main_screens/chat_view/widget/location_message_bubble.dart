@@ -63,21 +63,30 @@ class LocationMessageBubble extends StatelessWidget {
         child: Container(
           constraints: const BoxConstraints(maxWidth: 280),
           margin: EdgeInsets.only(
-            top: 5,
-            bottom: 5,
+            top: 4,
+            bottom: 4,
             left: isSender ? 60 : 10,
             right: isSender ? 10 : 60,
           ),
           decoration: BoxDecoration(
             color: isSender 
-                ? AppColors.primaryColor.withOpacity(0.3) 
-                : const Color(0xff383838),
+                ? AppColors.primaryColor.withOpacity(0.9)
+                : Colors.white,
             borderRadius: BorderRadius.only(
-              topLeft: const Radius.circular(15),
-              topRight: const Radius.circular(15),
-              bottomLeft: Radius.circular(isSender ? 15 : 0),
-              bottomRight: Radius.circular(isSender ? 0 : 15),
+              topLeft: const Radius.circular(20),
+              topRight: const Radius.circular(20),
+              bottomLeft: Radius.circular(isSender ? 20 : 0),
+              bottomRight: Radius.circular(isSender ? 0 : 20),
             ),
+            boxShadow: [
+              BoxShadow(
+                color: isSender 
+                    ? AppColors.primaryColor.withOpacity(0.25)
+                    : Colors.black.withOpacity(0.06),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -136,7 +145,7 @@ class LocationMessageBubble extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
-                              color: Colors.white,
+                              color: isSender ? Colors.white : AppColors.txtDark,
                             ),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
@@ -152,14 +161,14 @@ class LocationMessageBubble extends StatelessWidget {
                           'Tap to open in maps',
                           style: TextStyle(
                             fontSize: 10,
-                            color: isSender ? Colors.white70 : Colors.grey[400],
+                            color: isSender ? Colors.white.withOpacity(0.85) : AppColors.txtGrey,
                           ),
                         ),
                         Text(
                           _formatTime(time),
                           style: TextStyle(
                             fontSize: 10,
-                            color: isSender ? Colors.white60 : Colors.grey[500],
+                            color: isSender ? Colors.white.withOpacity(0.85) : AppColors.txtGrey,
                           ),
                         ),
                       ],
