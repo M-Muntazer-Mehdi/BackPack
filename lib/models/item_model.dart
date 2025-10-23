@@ -11,6 +11,7 @@ class ItemModel {
   late String description;
   late dynamic geo;
   late List reports;
+  late String hourlyRate;
 
   ItemModel({
     required this.id,
@@ -23,11 +24,13 @@ class ItemModel {
     required this.description,
     required this.geo,
     required this.reports,
+    required this.hourlyRate,
   });
 
   factory ItemModel.fromDocumentSnapshot(DocumentSnapshot doc) {
     var id = doc.id;
     var data = doc.data() as Map;
+    print('DEBUG: hourlyRate from Firestore: ${data['hourlyRate']}');
     return ItemModel(
         id: id,
         category: '',
@@ -38,7 +41,8 @@ class ItemModel {
         location: data['location'] ?? '',
         description: data['description'] ?? '',
         geo: doc['geo']['geopoint'] as GeoPoint,
-        reports: data['reportedBy'] ?? []);
+        reports: data['reportedBy'] ?? [],
+        hourlyRate: data['hourlyRate']?.toString() ?? '0');
   }
 
   Map<String, dynamic> toMap() => {
