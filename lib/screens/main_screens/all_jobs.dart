@@ -162,7 +162,7 @@ class _AllJobsState extends State<AllJobs> with TickerProviderStateMixin {
         borderRadius: BorderRadius.circular(20),
         shadowColor: AppColors.primaryColor.withOpacity(0.3),
         child: Container(
-          decoration: BoxDecoration(
+                                          decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
             gradient: LinearGradient(
               begin: Alignment.topLeft,
@@ -172,14 +172,14 @@ class _AllJobsState extends State<AllJobs> with TickerProviderStateMixin {
                 Colors.white.withOpacity(0.95),
               ],
             ),
-            border: Border.all(
+                                              border: Border.all(
               color: AppColors.primaryColor.withOpacity(0.2),
               width: 1.5,
             ),
           ),
           child: Padding(
             padding: const EdgeInsets.all(20),
-            child: Column(
+                                          child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Job title and type
@@ -869,14 +869,14 @@ class _AllJobsState extends State<AllJobs> with TickerProviderStateMixin {
                         );
                       },
                     ),
-                  ],
-                ),
-              ),
+                                            ],
+                                          ),
+                                        ),
               
               const SizedBox(height: 16),
               
               // Location card
-              GestureDetector(
+                                        GestureDetector(
                 onTap: () {
                   Get.to(() => PickLocation(
                     onSubmit: (loc, latlng) {
@@ -887,25 +887,25 @@ class _AllJobsState extends State<AllJobs> with TickerProviderStateMixin {
                     },
                   ));
                 },
-                child: Container(
+                                          child: Container(
                   padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
+                                            decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color: AppColors.primaryColor.withOpacity(0.2),
                       width: 1.5,
                     ),
-                    boxShadow: [
-                      BoxShadow(
+                                              boxShadow: [
+                                                BoxShadow(
                         color: AppColors.primaryColor.withOpacity(0.08),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
+                                                ),
+                                              ],
+                                            ),
+                                            child: Row(
+                                              children: [
                       Container(
                         width: 40,
                         height: 40,
@@ -915,7 +915,7 @@ class _AllJobsState extends State<AllJobs> with TickerProviderStateMixin {
                         ),
                         child: const Icon(
                           Icons.location_on_rounded,
-                          color: Colors.white,
+                                                  color: Colors.white,
                           size: 20,
                         ),
                       ),
@@ -935,16 +935,16 @@ class _AllJobsState extends State<AllJobs> with TickerProviderStateMixin {
                               overflow: TextOverflow.ellipsis,
                             ),
                             const SizedBox(height: 2),
-                            Text(
+                                                Text(
                               'Tap to change location',
                               style: TextStyle(
                                 fontSize: 12,
                                 color: AppColors.txtGrey,
                               ),
-                            ),
-                          ],
-                        ),
-                      ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
                       Icon(
                         Icons.edit_location_alt_rounded,
                         color: AppColors.primaryColor.withOpacity(0.6),
@@ -953,12 +953,12 @@ class _AllJobsState extends State<AllJobs> with TickerProviderStateMixin {
                     ],
                   ),
                 ),
-              ),
-            ],
+                ),
+              ],
+            ),
           ),
         ),
-      ),
-    );
+      );
   }
 
 

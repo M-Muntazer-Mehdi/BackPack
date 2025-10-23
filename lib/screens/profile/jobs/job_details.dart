@@ -124,86 +124,136 @@ class _AppliedJobDetailsState extends State<AppliedJobDetails> with TickerProvid
   }
 
   Widget _buildPremiumHeader() {
-    return AnimatedBuilder(
-      animation: _headerAnimController,
-      builder: (context, child) {
-        return Container(
-          clipBehavior: Clip.none,
-          padding: EdgeInsets.only(
-            top: MediaQuery.of(context).padding.top * 0.6,
+    return Container(
+      padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top * 0.6),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppColors.primaryColor,
+            AppColors.primaryColor.withOpacity(0.8),
+            AppColors.primaryColor.withOpacity(0.6),
+          ],
+          stops: const [0.0, 0.6, 1.0],
+        ),
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(35),
+          bottomRight: Radius.circular(35),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primaryColor.withOpacity(0.4),
+            blurRadius: 25,
+            offset: const Offset(0, 12),
           ),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                AppColors.primaryColor,
-                AppColors.primaryColor.withOpacity(0.85),
-                AppColors.primaryColor.withOpacity(0.7),
-              ],
-              stops: [
-                0.0,
-                0.5 + (0.2 * math.sin(_headerAnimController.value * 2 * math.pi)),
-                1.0,
-              ],
+        ],
+      ),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          // Background decorative elements
+          Positioned(
+            top: -20,
+            right: -20,
+            child: Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withOpacity(0.1),
+              ),
             ),
           ),
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              // Floating elements
-              ..._buildFloatingElements(),
-              
-              // Main header content
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Top row with back button and report button
-                    Row(
+          Positioned(
+            bottom: -30,
+            left: -30,
+            child: Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withOpacity(0.08),
+              ),
+            ),
+          ),
+          
+          // Floating animated elements
+          ..._buildFloatingElements(),
+          
+          // Main header content
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 25),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Top navigation row
+                Row(
           children: [
-                        // Back button
-                        GestureDetector(
-                          onTap: () => Get.back(),
-                          child: Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: Colors.white.withOpacity(0.3),
-                                width: 1,
-                              ),
-                            ),
-                            child: const Icon(
-                              Icons.arrow_back_ios_rounded,
-                              color: Colors.white,
-                              size: 18,
-                            ),
+                    // Back button with enhanced design
+                    GestureDetector(
+                      onTap: () => Get.back(),
+                      child: Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.25),
+                            width: 1.5,
                           ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                         ),
-                        
-                        const Spacer(),
-                        
-                        // Report button
-                        !widget.isReported
-                            ? GestureDetector(
-                                onTap: () {
-                                  _showReportConfirmationModal();
-                                },
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.2),
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                      color: Colors.white.withOpacity(0.3),
-                                      width: 1,
-                                    ),
+                        child: const Icon(
+                          Icons.arrow_back_ios_rounded,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                      ),
+                    ),
+                    
+                    const Spacer(),
+                    
+                    // Report button with enhanced design
+                    !widget.isReported
+                        ? GestureDetector(
+                            onTap: () {
+                              _showReportConfirmationModal();
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.15),
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
+                                  color: Colors.white.withOpacity(0.25),
+                                  width: 1.5,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.1),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
                                   ),
-                                  child: const Text(
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.report_problem_rounded,
+                                    color: Colors.white,
+                                    size: 16,
+                                  ),
+                                  const SizedBox(width: 6),
+                                  const Text(
                                     'Report',
                                     style: TextStyle(
                                       color: Colors.white,
@@ -211,105 +261,166 @@ class _AppliedJobDetailsState extends State<AppliedJobDetails> with TickerProvid
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
+                                ],
+                              ),
+                            ),
+                          )
+                        : Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                            decoration: BoxDecoration(
+                              color: Colors.red.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(
+                                color: Colors.red.withOpacity(0.3),
+                                width: 1.5,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.check_circle_rounded,
+                                  color: Colors.red[300],
+                                  size: 16,
                                 ),
-                              )
-                            : Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                decoration: BoxDecoration(
-                                  color: Colors.red.withOpacity(0.2),
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: Colors.red.withOpacity(0.3),
-                                    width: 1,
-                                  ),
-                                ),
-                                child: const Text(
+                                const SizedBox(width: 6),
+                                Text(
                                   'Reported',
                                   style: TextStyle(
-                                    color: Colors.white,
+                                    color: Colors.red[300],
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
-                              ),
-                      ],
+                              ],
+                            ),
+                          ),
+                  ],
+                ),
+                
+                const SizedBox(height: 25),
+                
+                // Job information section
+                Row(
+                  children: [
+                    // Enhanced job icon with floating animation
+                    AnimatedBuilder(
+                      animation: _floatController,
+                      builder: (context, child) {
+                        return Transform.translate(
+                          offset: Offset(0, -3 + (6 * _floatController.value)),
+                          child: Container(
+                            width: 60,
+                            height: 60,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(18),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.2),
+                                  blurRadius: 15,
+                                  offset: const Offset(0, 6),
+                                ),
+                                BoxShadow(
+                                  color: AppColors.primaryColor.withOpacity(0.3),
+                                  blurRadius: 20,
+                                  offset: const Offset(0, 8),
+                                ),
+                              ],
+                            ),
+                            child: Icon(
+                              Icons.work_rounded,
+                              color: AppColors.primaryColor,
+                              size: 30,
+                            ),
+                          ),
+                        );
+                      },
                     ),
                     
-                    const SizedBox(height: 20),
+                    const SizedBox(width: 20),
                     
-                    // Job icon and title
-                    Row(
-                      children: [
-                        // Job icon
-                        AnimatedBuilder(
-                          animation: _floatController,
-                          builder: (context, child) {
-                            return Transform.translate(
-                              offset: Offset(0, -2 + (4 * _floatController.value)),
-                              child: Container(
-                                width: 50,
-                                height: 50,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(14),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.15),
-                                      blurRadius: 12,
-                                      offset: const Offset(0, 4),
-                                    ),
-                                  ],
-                                ),
-                                child: Icon(
-                                  Icons.work_rounded,
-                                  color: AppColors.primaryColor,
-                                  size: 26,
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                        
-                        const SizedBox(width: 16),
-                        
-                        // Title and subtitle
-                        Expanded(
+                    // Enhanced title section
+                    Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                          // Subtitle with icon
+                          Row(
+                            children: [
+                              Container(
+                                width: 20,
+                                height: 20,
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: const Icon(
+                                  Icons.description_rounded,
+                                  color: Colors.white,
+                                  size: 12,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
                               const Text(
                                 'Job Details',
                                 style: TextStyle(
                                   fontSize: 14,
-                                  fontWeight: FontWeight.w500,
+                                  fontWeight: FontWeight.w600,
                                   color: Colors.white70,
+                                  letterSpacing: 0.5,
                                 ),
-                              ),
-                              const SizedBox(height: 4),
-                  Text(
-                                widget.itemModel.title,
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w900,
-                                  color: Colors.white,
-                                  letterSpacing: -0.5,
-                                  height: 1,
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
                               ),
                             ],
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: 8),
+                          // Main title with enhanced styling
+                  Text(
+                            widget.itemModel.title,
+                            style: const TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w900,
+                              color: Colors.white,
+                              letterSpacing: -0.3,
+                              height: 1.1,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 6),
+                          // Location with icon
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.location_on_rounded,
+                                color: Colors.white.withOpacity(0.8),
+                                size: 14,
+                              ),
+                              const SizedBox(width: 4),
+                              Expanded(
+                                child: Text(
+                                  widget.itemModel.location,
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.white.withOpacity(0.9),
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                   ),
                 ],
               ),
             ),
-            ],
-          ),
-        );
-      },
+        ],
+      ),
     );
   }
 
@@ -940,3 +1051,4 @@ class _AppliedJobDetailsState extends State<AppliedJobDetails> with TickerProvid
     }
   }
 }
+
