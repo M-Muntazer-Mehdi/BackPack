@@ -392,6 +392,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
       builder: (value) {
         return GestureDetector(
           onTap: () => Get.to(() => const MyAccount()),
+          behavior: HitTestBehavior.opaque,
           child: AnimatedBuilder(
             animation: _floatController,
             builder: (context, child) {
@@ -449,7 +450,9 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
             offset: Offset(0, _filterSlideAnimation.value * 180),
             child: Opacity(
               opacity: _filterOpacityAnimation.value,
-              child: Container(
+              child: IgnorePointer(
+                ignoring: _filterController.value < 0.1, // Disable interaction when closed
+                child: Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(24),
@@ -856,6 +859,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
               ),
             ),
           ),
+        ),
         );
       },
     );
@@ -863,10 +867,11 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
 
   Widget _buildUniqueMorphingButton() {
     return Positioned(
-      top: 134,
+      top: 140,
       right: 12,
       child: GestureDetector(
         onTap: _toggleFilters,
+        behavior: HitTestBehavior.opaque,
         child: AnimatedBuilder(
           animation: Listenable.merge([
             _buttonMorphController,

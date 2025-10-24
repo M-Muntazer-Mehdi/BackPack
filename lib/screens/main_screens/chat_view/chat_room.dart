@@ -69,15 +69,20 @@ class ChatDetailScreenState extends State<ChatDetailScreen> {
     return Scaffold(
         backgroundColor: AppColors.bgGrey,
         body: SafeArea(
-            child: Stack(
-          children: [
-            Column(
-              children: [
-                // Premium Chat Header
-                _buildChatHeader(),
-                Expanded(child: messagesV2(context)),
-              ],
-            ),
+            child: GestureDetector(
+              onTap: () {
+                // Dismiss keyboard when tapping outside input field
+                FocusScope.of(context).unfocus();
+              },
+              child: Stack(
+                children: [
+                  Column(
+                    children: [
+                      // Premium Chat Header
+                      _buildChatHeader(),
+                      Expanded(child: messagesV2(context)),
+                    ],
+                  ),
             if (widget.chat.status == 'pending' &&
                 widget.chat.createdBy != Get.find<UserDetail>().userId)
               Positioned(
@@ -232,7 +237,9 @@ class ChatDetailScreenState extends State<ChatDetailScreen> {
               },
             ),
           ],
-        )));
+        ),
+      ),
+    ));
   }
 
   // Stack messages(BuildContext context) {

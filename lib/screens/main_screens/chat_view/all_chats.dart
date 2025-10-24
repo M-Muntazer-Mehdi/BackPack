@@ -425,7 +425,7 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       print('✅ Query: Accepted chats for user: ${Get.find<UserDetail>().userId}');
     } else if (selectedCat == 2) {
       stream = collection
-          .where('users', arrayContains: Get.find<UserDetail>().userId)
+          .where('users', arrayContainsAny: [Get.find<UserDetail>().userId])
           .where('status', isEqualTo: 'pending')
           .where('createdBy', isEqualTo: Get.find<UserDetail>().userId)
           .orderBy('timestamp', descending: true)
@@ -433,14 +433,14 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       print('⏳ Query: Pending chats created by user: ${Get.find<UserDetail>().userId}');
     } else if (selectedCat == 3) {
       stream = collection
-          .where('users', arrayContains: Get.find<UserDetail>().userId)
+          .where('users', arrayContainsAny: [Get.find<UserDetail>().userId])
           .where('status', isEqualTo: 'rejected')
           .orderBy('timestamp', descending: true)
           .snapshots();
       print('❌ Query: Rejected chats for user: ${Get.find<UserDetail>().userId}');
     } else {
       stream = collection
-          .where('users', arrayContains: Get.find<UserDetail>().userId)
+          .where('users', arrayContainsAny: [Get.find<UserDetail>().userId])
           .where('status', isEqualTo: 'pending')
           .where('createdBy', isNotEqualTo: Get.find<UserDetail>().userId)
           .orderBy('timestamp', descending: true)
