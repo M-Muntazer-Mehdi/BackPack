@@ -221,7 +221,7 @@ class _MyAccountState extends State<MyAccount> with TickerProviderStateMixin {
   Widget _buildPremiumProfileHeader() {
     return GetBuilder<UserDetail>(
       builder: (value) {
-        return Container(
+    return Container(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
           clipBehavior: Clip.none,
           decoration: BoxDecoration(
@@ -256,7 +256,7 @@ class _MyAccountState extends State<MyAccount> with TickerProviderStateMixin {
           ),
           child: Stack(
             clipBehavior: Clip.none,
-            children: [
+        children: [
               // Decorative gradient overlay circles
               Positioned(
                 top: -40,
@@ -339,41 +339,41 @@ class _MyAccountState extends State<MyAccount> with TickerProviderStateMixin {
                                 color: const Color(0xFF9D7BFF).withOpacity(0.4),
                                 blurRadius: 20,
                                 offset: const Offset(0, 8),
-                              ),
-                            ],
-                          ),
+          ),
+        ],
+      ),
                           child: CircleAvatar(
                             radius: 34,
                             backgroundColor: Colors.white,
-                            child: CircleAvatar(
+            child: CircleAvatar(
                               radius: 32,
                               backgroundColor: AppColors.primaryLight,
-                              child: value.image == ''
+              child: value.image == ''
                                   ? const Icon(
                                       Icons.person_rounded,
                                       size: 34,
                                       color: Colors.white,
                                     )
-                                  : ClipRRect(
+                  : ClipRRect(
                                       borderRadius: BorderRadius.circular(32),
-                                      child: Image.network(
-                                        value.image,
-                                        fit: BoxFit.cover,
-                                        height: double.infinity,
-                                        width: double.infinity,
-                                      ),
-                                    ),
-                            ),
-                          ),
+                      child: Image.network(
+                        value.image,
+                        fit: BoxFit.cover,
+                        height: double.infinity,
+                        width: double.infinity,
+                      ),
+                    ),
+            ),
+          ),
                         ),
                       );
                     },
-                  ),
+          ),
                   
                   const SizedBox(width: 16),
                   
                   // User info
-                  Expanded(
+          Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -492,7 +492,7 @@ class _MyAccountState extends State<MyAccount> with TickerProviderStateMixin {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(20),
-        child: Padding(
+            child: Padding(
           padding: const EdgeInsets.all(12),
           child: Row(
             children: [
@@ -525,10 +525,10 @@ class _MyAccountState extends State<MyAccount> with TickerProviderStateMixin {
               
               // Title and subtitle
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
                       title,
                       style: TextStyle(
                         fontSize: 14,

@@ -789,21 +789,25 @@ class ChatDetailScreenState extends State<ChatDetailScreen> {
                                     : MsgType.left);
                         return GestureDetector(
                           onLongPress: () {
-                            chatModel.from != Get.find<UserDetail>().userId
-                                ? chatModel.status == 'Reported'
-                                    ? Global.showToastAlert(
-                                        context: Get.overlayContext!,
-                                        strTitle: "ok",
-                                        strMsg:
-                                            'Message has been reported already',
-                                        toastType: TOAST_TYPE.toastError)
-                                    : showReportDialog(
-                                        context,
-                                        chatModel,
-                                        messageId:
-                                            snapshot.data?.docs[index].id ?? '',
-                                      )
-                                : null;
+                            final messageId = snapshot.data?.docs[index].id ?? '';
+                            if (chatModel.from == Get.find<UserDetail>().userId) {
+                              // Own message - show delete option
+                              showDeleteDialog(context, messageId);
+                            } else {
+                              // Other user's message - show report option
+                              chatModel.status == 'Reported'
+                                  ? Global.showToastAlert(
+                                      context: Get.overlayContext!,
+                                      strTitle: "ok",
+                                      strMsg:
+                                          'Message has been reported already',
+                                      toastType: TOAST_TYPE.toastError)
+                                  : showReportDialog(
+                                      context,
+                                      chatModel,
+                                      messageId: messageId,
+                                    );
+                            }
                           },
                           child: ChatListItem(
                             mChatModel: chat,
@@ -994,6 +998,78 @@ class ChatDetailScreenState extends State<ChatDetailScreen> {
     } catch (err) {
       EasyLoading.dismiss();
       debugPrint("error while reporting message is : $err");
+    }
+  }
+
+  void showDeleteDialog(BuildContext context, String messageId) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Row(
+            children: [
+              Icon(
+                Icons.delete_outline_rounded,
+                color: AppColors.errorRed,
+                size: 24,
+              ),
+              const SizedBox(width: 12),
+              const Text('Delete Message'),
+            ],
+          ),
+          content: const Text(
+            'Are you sure you want to delete this message? This action cannot be undone.',
+            style: TextStyle(fontSize: 14),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: AppColors.txtGrey,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                deleteMessage(context, messageId);
+              },
+              child: Text(
+                'Delete',
+                style: TextStyle(
+                  color: AppColors.errorRed,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> deleteMessage(BuildContext context, String messageId) async {
+    EasyLoading.show(status: 'Deleting...');
+    try {
+      await FirebaseFirestore.instance
+          .collection('chats')
+          .doc(widget.chat.roomId)
+          .collection('messages')
+          .doc(messageId)
+          .delete();
+      
+      EasyLoading.dismiss();
+      EasyLoading.showSuccess('Message deleted');
+    } catch (err) {
+      EasyLoading.dismiss();
+      debugPrint("Error while deleting message: $err");
+      EasyLoading.showError('Failed to delete message');
     }
   }
 }

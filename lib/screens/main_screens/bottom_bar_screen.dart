@@ -36,7 +36,7 @@ class _NavBarScreenState extends State<NavBarScreen> with SingleTickerProviderSt
         return Scaffold(
           backgroundColor: Colors.white,
           body: IndexedStack(
-            index: value.currentIndex,
+                  index: value.currentIndex,
             children: const [
               MapScreen(),
               Buddies(),
@@ -52,24 +52,24 @@ class _NavBarScreenState extends State<NavBarScreen> with SingleTickerProviderSt
 
   Widget _buildModernBottomBar(NavBarController controller) {
     return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
             color: Colors.black.withOpacity(0.05),
             offset: const Offset(0, -4),
             blurRadius: 20,
             spreadRadius: 0,
-          ),
-        ],
-      ),
+                          ),
+                        ],
+                      ),
       child: SafeArea(
         child: Container(
           height: 70,
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-          child: Row(
+                      child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
+                        children: [
               _buildNavItem(
                 icon: Icons.explore_rounded,
                 label: 'Explore',
@@ -93,11 +93,11 @@ class _NavBarScreenState extends State<NavBarScreen> with SingleTickerProviderSt
                 label: 'Jobs',
                 index: 3,
                 controller: controller,
-              ),
-            ],
-          ),
-        ),
-      ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
     );
   }
 
@@ -153,9 +153,9 @@ class _NavBarScreenState extends State<NavBarScreen> with SingleTickerProviderSt
                 child: Text(label),
               ),
             ],
-          ],
-        ),
-      ),
+                ],
+              ),
+            ),
     );
   }
 }
