@@ -232,25 +232,46 @@ class ChatListItem extends StatelessWidget {
                   Navigator.of(context).push(MaterialPageRoute(
                       builder: (_) => ImageView(mChatModel.files.first)));
                 },
-                child: CachedNetworkImage(
-                  imageUrl: mChatModel.files.first,
-                  fit: BoxFit.cover,
-                  progressIndicatorBuilder: (context, url, downloadProgress) =>
-                      Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        value: downloadProgress.progress,
-                        color: Colors.grey,
-                        backgroundColor: AppColors.primaryColor,
-                      ),
-                    ),
+                child: Container(
+                  constraints: const BoxConstraints(
+                    maxWidth: 250,
+                    maxHeight: 250,
                   ),
-                  errorWidget: (context, url, error) => const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Icon(
-                      Icons.error,
-                      size: 18,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: CachedNetworkImage(
+                      imageUrl: mChatModel.files.first,
+                      fit: BoxFit.cover,
+                      width: 250,
+                      height: 250,
+                      progressIndicatorBuilder: (context, url, downloadProgress) =>
+                          Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            value: downloadProgress.progress,
+                            color: Colors.grey,
+                            backgroundColor: AppColors.primaryColor,
+                          ),
+                        ),
+                      ),
+                      errorWidget: (context, url, error) => const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Icon(
+                          Icons.error,
+                          size: 18,
+                        ),
+                      ),
                     ),
                   ),
                 ))
@@ -267,12 +288,13 @@ class ChatListItem extends StatelessWidget {
                   child: GridView.builder(
                       padding: const EdgeInsets.only(bottom: 10),
                       shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
                       itemCount: mChatModel.files.length > 4
                           ? 4
                           : mChatModel.files.length,
                       gridDelegate:
                           const SliverGridDelegateWithMaxCrossAxisExtent(
-                              maxCrossAxisExtent: 200,
+                              maxCrossAxisExtent: 150,
                               childAspectRatio: 3 / 3,
                               crossAxisSpacing: 5,
                               mainAxisSpacing: 5),

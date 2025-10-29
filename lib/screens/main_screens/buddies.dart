@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
@@ -13,7 +14,9 @@ import 'package:back_packers/models/group_chat_model.dart';
 import 'package:back_packers/models/user.dart';
 import 'package:back_packers/screens/main_screens/chat_view/chat_room.dart';
 import 'package:back_packers/screens/main_screens/store.dart';
+
 import 'package:back_packers/screens/other_screens/pick_location_controller.dart';
+import 'package:back_packers/services/connection_request_service.dart';
 import 'package:back_packers/utils/app_colors.dart';
 import 'package:back_packers/utils/login_details.dart';
 import 'package:back_packers/widgets/custom_bottom_option_sheet.dart';
@@ -24,6 +27,7 @@ class Buddies extends StatefulWidget {
   @override
   State<Buddies> createState() => _BuddiesState();
 }
+
 
 class _BuddiesState extends State<Buddies> with TickerProviderStateMixin {
   late AnimationController _headerAnimController;
@@ -95,12 +99,14 @@ class _BuddiesState extends State<Buddies> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
       backgroundColor: AppColors.bgGrey,
       extendBodyBehindAppBar: true,
       body: GetBuilder<StoreController>(
           builder: (logic) {
             return Column(
               children: [
+
                 // Modern header
                 _buildHeader(),
                 
@@ -121,6 +127,7 @@ class _BuddiesState extends State<Buddies> with TickerProviderStateMixin {
                 // Buddies list
                 Expanded(
                   child: StreamBuilder<List<DocumentSnapshot<UserModel>>>(
+
                     stream: Database.getNearByBuddies(
                       logic.latLng,
                       '',
@@ -128,9 +135,11 @@ class _BuddiesState extends State<Buddies> with TickerProviderStateMixin {
                     ),
                       builder: (context, snap) {
                         if (snap.hasError) {
+
                         return _buildEmptyState('No Buddies Available');
                         }
                         if (!snap.hasData) {
+
                         return Center(
                           child: CircularProgressIndicator(
                             color: AppColors.primaryColor,
@@ -138,14 +147,17 @@ class _BuddiesState extends State<Buddies> with TickerProviderStateMixin {
                         );
                         }
                         if (snap.data!.isEmpty) {
+
                         return _buildEmptyState('No Buddies Nearby');
                         }
 
                         return ListView.builder(
+
                         padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
                             itemCount: snap.data?.length,
                             itemBuilder: (context, index) {
                               UserModel? userModel = snap.data?[index].data();
+
                           
                           // Filter out self and reported users
                           if (userModel?.id == Get.find<UserDetail>().userId ||
@@ -155,9 +167,11 @@ class _BuddiesState extends State<Buddies> with TickerProviderStateMixin {
                           
                           return _buildAnimatedBuddieCard(
                                 userModel,
+
                             index: index,
                                 myId: Get.find<UserDetail>().userId,
                               );
+
                         },
                       );
                     },
@@ -803,6 +817,7 @@ class _BuddiesState extends State<Buddies> with TickerProviderStateMixin {
             ),
           ),
         );
+
                           },
                         ),
                       ],
@@ -906,6 +921,7 @@ class _BuddiesState extends State<Buddies> with TickerProviderStateMixin {
     final isApproved = userModel?.approved ?? false;
     
   return Container(
+
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -925,6 +941,7 @@ class _BuddiesState extends State<Buddies> with TickerProviderStateMixin {
         ],
       ),
     child: Column(
+
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Compact header with photo and info side by side
@@ -933,9 +950,11 @@ class _BuddiesState extends State<Buddies> with TickerProviderStateMixin {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+
                 // Profile photo
                 Stack(
               children: [
+
                     Container(
                       width: 90,
                       height: 110,
@@ -951,6 +970,7 @@ class _BuddiesState extends State<Buddies> with TickerProviderStateMixin {
                         ),
                       ),
                   child: ClipRRect(
+
                         borderRadius: BorderRadius.circular(16),
                     child: NetworkImageCustom(
                       image: userModel?.image,
@@ -958,6 +978,7 @@ class _BuddiesState extends State<Buddies> with TickerProviderStateMixin {
                     ),
                   ),
                 ),
+
                     // Verification badge on photo
                     if (isApproved)
                       Positioned(
@@ -986,6 +1007,7 @@ class _BuddiesState extends State<Buddies> with TickerProviderStateMixin {
                 ),
               ],
             ),
+
                 const SizedBox(width: 14),
                 // Info section
                 Expanded(
@@ -1090,6 +1112,7 @@ class _BuddiesState extends State<Buddies> with TickerProviderStateMixin {
             padding: const EdgeInsets.symmetric(horizontal: 14),
             child: Container(
           height: 1,
+
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
@@ -1138,6 +1161,7 @@ class _BuddiesState extends State<Buddies> with TickerProviderStateMixin {
             const SizedBox(width: 8),
             Text(
                 'Blocked',
+
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
@@ -1155,8 +1179,10 @@ class _BuddiesState extends State<Buddies> with TickerProviderStateMixin {
     return StreamBuilder<QuerySnapshot<ChatGroupModel>>(
                 stream: Database.getChatRoomStatus(userModel?.id ?? ""),
                 builder: (context, snap) {
+
         if (snap.hasError) return const SizedBox.shrink();
                   if (!snap.hasData) {
+
           return Center(
             child: SizedBox(
               height: 20,
@@ -1170,8 +1196,10 @@ class _BuddiesState extends State<Buddies> with TickerProviderStateMixin {
         }
 
                   final querySnapshot = snap.data;
+
         
                   if (querySnapshot?.docs.isNotEmpty ?? false) {
+
           String status = querySnapshot?.docs.first.data().status ?? "accepted";
           return _buildStatusButton(status, querySnapshot!.docs.first.data());
         }
@@ -1192,6 +1220,7 @@ class _BuddiesState extends State<Buddies> with TickerProviderStateMixin {
     switch (status) {
       case 'rejected':
                       label = 'Request Rejected';
+
         bgColor = AppColors.errorRed.withOpacity(0.1);
         textColor = AppColors.errorRed;
         icon = Icons.cancel_rounded;
@@ -1199,12 +1228,14 @@ class _BuddiesState extends State<Buddies> with TickerProviderStateMixin {
         break;
       case 'accepted':
                       label = 'Chat Now';
+
         bgColor = AppColors.successGreen.withOpacity(0.1);
         textColor = AppColors.successGreen;
         icon = Icons.chat_bubble_rounded;
         break;
       case 'pending':
                       label = 'Request Sent';
+
         bgColor = AppColors.warningYellow.withOpacity(0.1);
         textColor = AppColors.warningYellow;
         icon = Icons.schedule_rounded;
@@ -1270,17 +1301,26 @@ class _BuddiesState extends State<Buddies> with TickerProviderStateMixin {
   Widget _buildConnectButton(UserModel? userModel) {
     return GestureDetector(
       onTap: () async {
+        if (userModel != null) {
                       EasyLoading.show();
-        await FireDatabase.createChatRoom(userModel!).then((id) async {
+          
+          // Original logic: Create chat room (UNCHANGED)
+          await FireDatabase.createChatRoom(userModel).then((id) async {
                         if (id != 'null') {
                           var chatGroupModel = await Database.getSingleChat(id);
                           if (chatGroupModel.exists) {
-              Get.to(() => ChatDetailScreen(chat: chatGroupModel.data()!));
+                Get.to(() => ChatDetailScreen(chat: chatGroupModel.data()!));
+                
+                // NEW: Also create connection request for notifications (doesn't affect existing flow)
+                // This triggers Cloud Function to send push notification
+                ConnectionRequestService.sendConnectionRequest(userModel.id);
                           }
                         }
                       });
                       EasyLoading.dismiss();
-                    },
+        }
+      },
+
       child: Container(
         width: double.infinity,
         height: 44,
@@ -1314,7 +1354,8 @@ class _BuddiesState extends State<Buddies> with TickerProviderStateMixin {
             ],
           ),
         ),
-      ),
-    );
-  }
+    ),
+  );
 }
+}
+

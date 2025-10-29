@@ -9,6 +9,7 @@ import '../../globals/database.dart';
 import '../../globals/enum.dart';
 import '../../globals/global.dart';
 import '../../screens/main_screens/bottom_bar_screen.dart';
+import '../../services/fcm_service.dart';
 import '../../utils/login_details.dart';
 import '../../widgets/error_modal.dart';
 
@@ -102,6 +103,9 @@ class LoginController extends GetxController {
 
         await Get.find<UserDetail>().setData(user);
         await Get.find<UserDetail>().getData();
+
+        // Refresh FCM token after login
+        await FCMService.refreshToken();
 
         EasyLoading.dismiss();
         Get.offAll(() => NavBarScreen());

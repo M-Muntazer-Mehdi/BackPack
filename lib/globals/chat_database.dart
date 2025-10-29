@@ -75,7 +75,8 @@ class FireDatabase {
           .doc(docId)
           .collection('messages')
           .add({
-        "from": Get.find<UserDetail>().userId,
+        "senderId": Get.find<UserDetail>().userId, // Changed from "from" to "senderId" for Cloud Functions
+        "from": Get.find<UserDetail>().userId, // Keep "from" for backward compatibility
         "to": chat.to,
         "message": chat.message,
         "files": chat.files,

@@ -12,6 +12,7 @@ import '../../globals/enum.dart';
 import '../../globals/global.dart';
 import '../../models/user.dart';
 import '../../screens/main_screens/bottom_bar_screen.dart';
+import '../../services/fcm_service.dart';
 import '../../utils/login_details.dart';
 
 class SignUpController extends GetxController {
@@ -183,6 +184,10 @@ class SignUpController extends GetxController {
         await Database.createUserInDatabase(userModel);
         await Get.find<UserDetail>().setData(userModel);
         await Get.find<UserDetail>().getData();
+        
+        // Refresh FCM token after signup
+        await FCMService.refreshToken();
+        
         Get.offAll(() => const NavBarScreen());
         EasyLoading.dismiss();
         update();

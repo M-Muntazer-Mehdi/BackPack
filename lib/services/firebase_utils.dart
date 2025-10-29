@@ -35,7 +35,10 @@ class FirebaseUtils {
       FirebaseFirestore.instance
           .collection('users')
           .doc(FirebaseAuth.instance.currentUser!.uid)
-          .update({'token': token});
+          .update({
+        'token': token, // Keep for backward compatibility
+        'fcmToken': token, // Add for Cloud Functions
+      });
     }
     log('token $token');
   }

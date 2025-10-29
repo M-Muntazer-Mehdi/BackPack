@@ -3,6 +3,8 @@ import 'dart:ui';
 import 'package:back_packers/screens/main_screens/bottom_bar_screen.dart';
 import 'package:back_packers/services/firebase_utils.dart';
 import 'package:back_packers/services/local_notifications_helper.dart';
+import 'package:back_packers/services/fcm_service.dart';
+import 'package:back_packers/services/app_lifecycle_observer.dart';
 import 'package:back_packers/utils/app_theme_input_dec.dart';
 import 'package:back_packers/utils/login_details.dart';
 import 'package:back_packers/widgets/error_handler.dart';
@@ -41,6 +43,13 @@ Future<void> main() async {
   };
   LocalNotificationChannel.initializer();
   FirebaseUtils().pushNotifications();
+  
+  // Initialize FCM Service
+  await FCMService.initialize();
+  
+  // Add app lifecycle observer
+  WidgetsBinding.instance.addObserver(AppLifecycleObserver());
+  
   EasyLoading().dismissOnTap = false;
   EasyLoading().userInteractions = false;
 
