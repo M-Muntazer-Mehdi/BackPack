@@ -7,10 +7,12 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:back_packers/controllers/mainScreen_controllers/store_controller.dart';
 import 'package:back_packers/screens/main_screens/store.dart';
 import 'package:back_packers/screens/profile/account.dart';
+import 'package:back_packers/screens/main_screens/notifications_screen.dart';
 import 'package:back_packers/utils/app_colors.dart';
 import 'package:back_packers/utils/login_details.dart';
 import 'package:back_packers/widgets/custom_bottom_option_sheet.dart';
 import 'package:back_packers/screens/other_screens/pick_location_controller.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -372,6 +374,9 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                             ],
                           ),
                         ),
+                        // Notifications button
+                        _buildNotificationsButton(),
+                        const SizedBox(width: 10),
                         // Animated profile button
                         _buildAnimatedProfileButton(),
                       ],
@@ -384,6 +389,93 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
           );
         },
       ),
+    );
+  }
+  
+  Widget _buildNotificationsButton() {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('notifications')
+          .where('userId', isEqualTo: Get.find<UserDetail>().userId)
+          .where('read', isEqualTo: false)
+          .snapshots(),
+      builder: (context, snapshot) {
+        int unreadCount = snapshot.hasData ? snapshot.data!.docs.length : 0;
+        
+        return GestureDetector(
+          onTap: () => Get.to(() => const NotificationsScreen()),
+          behavior: HitTestBehavior.opaque,
+          child: AnimatedBuilder(
+            animation: _floatController,
+            builder: (context, child) {
+              return Transform.translate(
+                offset: Offset(0, math.sin(_floatController.value * 2 * math.pi + math.pi / 2) * 2),
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: AppColors.primaryColor.withOpacity(0.2),
+                      width: 2,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primaryColor.withOpacity(0.15),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Stack(
+                    children: [
+                      Center(
+                        child: Icon(
+                          Icons.notifications_rounded,
+                          color: AppColors.primaryColor,
+                          size: 22,
+                        ),
+                      ),
+                      if (unreadCount > 0)
+                        Positioned(
+                          right: 6,
+                          top: 6,
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: AppColors.errorRed,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: Colors.white,
+                                width: 2,
+                              ),
+                            ),
+                            constraints: const BoxConstraints(
+                              minWidth: 18,
+                              minHeight: 18,
+                            ),
+                            child: Center(
+                              child: Text(
+                                unreadCount > 99 ? '99+' : '$unreadCount',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      },
     );
   }
   

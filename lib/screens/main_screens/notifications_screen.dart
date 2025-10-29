@@ -259,7 +259,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> with TickerPr
         }
         
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
+          return Center(
             child: CircularProgressIndicator(
               color: AppColors.primaryColor,
             ),
