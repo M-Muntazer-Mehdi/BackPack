@@ -467,7 +467,7 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
           if (snapshot.data!.docs.isEmpty) {
             print('📱 No chats found for category: ${_statusList[selectedCat]}');
             return _buildEmptyState('No ${_statusList[selectedCat].toLowerCase()} chats');
-          }
+                  }
           return chats(snapshot);
         },
       ),
@@ -475,7 +475,7 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   }
 
   Widget _buildEmptyState(String message) {
-    return Center(
+                    return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -499,7 +499,7 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               fontSize: 16,
               fontWeight: FontWeight.w600,
               color: AppColors.txtDark,
-            ),
+                      ),
           ),
           const SizedBox(height: 8),
           Text(
@@ -560,8 +560,8 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
         user: user,
         chat: chat,
         search: search,
-      ),
-    );
+              ),
+            );
   }
 
   final List<String> _statusList = [
@@ -608,8 +608,8 @@ class _ChatListItemState extends State<ChatListItem> {
             if (widget.search.isNotEmpty) {
               if (!name.toLowerCase().contains(widget.search.toLowerCase())) {
             return const SizedBox.shrink();
-          }
-        }
+              }
+            }
         
         final hasUnread = widget.chat.unreadCount != 0 &&
             widget.chat.lastMessageBy != Get.find<UserDetail>().userId;
@@ -686,8 +686,8 @@ class _ChatListItemState extends State<ChatListItem> {
                           shape: BoxShape.circle,
                           border: Border.all(color: Colors.white, width: 2),
                         ),
-                      ),
                     ),
+                  ),
                   ],
                 ),
                 const SizedBox(width: 14),
@@ -724,8 +724,8 @@ class _ChatListItemState extends State<ChatListItem> {
                                 ? AppColors.primaryColor 
                                 : AppColors.txtGrey,
                             ),
-                          ),
-                        ],
+                              ),
+                            ],
                       ),
                       const SizedBox(height: 6),
                         Row(
@@ -745,7 +745,7 @@ class _ChatListItemState extends State<ChatListItem> {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
-                          ),
+                            ),
                           if (hasUnread) ...[
                             const SizedBox(width: 8),
                             Container(
@@ -768,7 +768,7 @@ class _ChatListItemState extends State<ChatListItem> {
                                   fontWeight: FontWeight.w800,
                                   color: Colors.white,
                                 ),
-                              ),
+                                ),
                             ),
                           ],
                           ],
@@ -776,8 +776,8 @@ class _ChatListItemState extends State<ChatListItem> {
                     ],
                   ),
                 ),
-              ],
-            ),
+                ],
+              ),
           ),
         );
       },

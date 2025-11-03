@@ -74,10 +74,10 @@ class ChatDetailScreenState extends State<ChatDetailScreen> {
                 // Dismiss keyboard when tapping outside input field
                 FocusScope.of(context).unfocus();
               },
-              child: Stack(
-                children: [
-                  Column(
-                    children: [
+            child: Stack(
+          children: [
+            Column(
+              children: [
                       // Premium Chat Header
                       _buildChatHeader(),
                       Expanded(child: messagesV2(context)),
@@ -92,29 +92,29 @@ class ChatDetailScreenState extends State<ChatDetailScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                          color: Colors.white,
                     borderRadius: BorderRadius.circular(18),
                     boxShadow: [
                       BoxShadow(
                         color: AppColors.primaryColor.withOpacity(0.12),
                         blurRadius: 20,
                         offset: const Offset(0, 6),
-                      ),
+                                      ),
                     ],
                   ),
-                  child: Column(
+                                        child: Column(
                     mainAxisSize: MainAxisSize.min,
-                    children: [
+                                      children: [
                       Row(
-                        children: [
+                                              children: [
                           Icon(
                             Icons.info_rounded,
                             color: AppColors.primaryColor,
                             size: 20,
                           ),
                           const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
+                                                Expanded(
+                                                    child: Text(
                               'New Connection Request',
                               style: TextStyle(
                                 fontSize: 14,
@@ -123,8 +123,8 @@ class ChatDetailScreenState extends State<ChatDetailScreen> {
                               ),
                             ),
                           ),
-                        ],
-                      ),
+                    ],
+                  ),
                       const SizedBox(height: 12),
                       Row(
                   children: [
@@ -213,7 +213,7 @@ class ChatDetailScreenState extends State<ChatDetailScreen> {
                               ),
                             ),
                           ),
-                        ],
+                  ],
                       ),
                     ],
                   ),
@@ -385,7 +385,7 @@ class ChatDetailScreenState extends State<ChatDetailScreen> {
           );
         }),
         // Input area
-        Container(
+            Container(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
           decoration: BoxDecoration(
             color: Colors.white,
@@ -408,7 +408,7 @@ class ChatDetailScreenState extends State<ChatDetailScreen> {
                   decoration: BoxDecoration(
                     color: AppColors.bgGrey,
                     borderRadius: BorderRadius.circular(12),
-                  ),
+            ),
                   child: Icon(
                     Icons.add_rounded,
                     color: AppColors.primaryColor,
@@ -463,9 +463,9 @@ class ChatDetailScreenState extends State<ChatDetailScreen> {
                             Icons.camera_alt_rounded,
                             color: AppColors.primaryColor,
                             size: 24,
-                          ),
-                        ),
-                      ),
+                ),
+              ),
+            ),
                     ],
                   ),
                 ),
@@ -796,15 +796,15 @@ class ChatDetailScreenState extends State<ChatDetailScreen> {
                             } else {
                               // Other user's message - show report option
                               chatModel.status == 'Reported'
-                                  ? Global.showToastAlert(
-                                      context: Get.overlayContext!,
-                                      strTitle: "ok",
-                                      strMsg:
-                                          'Message has been reported already',
-                                      toastType: TOAST_TYPE.toastError)
-                                  : showReportDialog(
-                                      context,
-                                      chatModel,
+                                    ? Global.showToastAlert(
+                                        context: Get.overlayContext!,
+                                        strTitle: "ok",
+                                        strMsg:
+                                            'Message has been reported already',
+                                        toastType: TOAST_TYPE.toastError)
+                                    : showReportDialog(
+                                        context,
+                                        chatModel,
                                       messageId: messageId,
                                     );
                             }

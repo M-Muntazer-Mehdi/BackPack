@@ -217,8 +217,8 @@ class _ForgetPasswordState extends State<ForgetPassword> with TickerProviderStat
                         size: 24,
                       ),
                     ),
-                        ),
-                      ),
+                ),
+              ),
                       
                       SizedBox(height: ht(20)),
                       
@@ -258,7 +258,7 @@ class _ForgetPasswordState extends State<ForgetPassword> with TickerProviderStat
                                     height: 1.1,
                                   ),
                                 ),
-                              ),
+                  ),
                               
                               SizedBox(height: ht(16)),
                               
@@ -275,7 +275,7 @@ class _ForgetPasswordState extends State<ForgetPassword> with TickerProviderStat
                             ],
                           ),
                         ),
-                      ),
+                  ),
                       
                         SizedBox(height: MediaQuery.of(context).size.height * 0.08),
                       
@@ -632,8 +632,8 @@ class GridPatternPainter extends CustomPainter {
         Offset(x, 0),
         Offset(x, size.height),
         paint,
-      );
-    }
+    );
+  }
     
     // Draw horizontal lines
     for (double y = 0; y < size.height; y += spacing) {

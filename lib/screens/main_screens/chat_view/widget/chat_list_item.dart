@@ -124,15 +124,15 @@ class ChatListItem extends StatelessWidget {
                         children: [
                           showImages(context),
                           if (mChatModel.message.isNotEmpty)
-                            Text(
-                              mChatModel.message,
+                          Text(
+                            mChatModel.message,
                               style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w500,
                                 color: AppColors.txtDark,
                                 height: 1.4,
                               ),
-                            ),
+                          ),
                           const SizedBox(height: 6),
                           Text(
                             timeago.format(mChatModel.time.toDate(),
@@ -249,27 +249,27 @@ class ChatListItem extends StatelessWidget {
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(12),
-                    child: CachedNetworkImage(
-                      imageUrl: mChatModel.files.first,
-                      fit: BoxFit.cover,
+                child: CachedNetworkImage(
+                  imageUrl: mChatModel.files.first,
+                  fit: BoxFit.cover,
                       width: 250,
                       height: 250,
-                      progressIndicatorBuilder: (context, url, downloadProgress) =>
-                          Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: Center(
-                          child: CircularProgressIndicator(
-                            value: downloadProgress.progress,
-                            color: Colors.grey,
-                            backgroundColor: AppColors.primaryColor,
-                          ),
-                        ),
+                  progressIndicatorBuilder: (context, url, downloadProgress) =>
+                      Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        value: downloadProgress.progress,
+                        color: Colors.grey,
+                        backgroundColor: AppColors.primaryColor,
                       ),
-                      errorWidget: (context, url, error) => const Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Icon(
-                          Icons.error,
-                          size: 18,
+                    ),
+                  ),
+                  errorWidget: (context, url, error) => const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Icon(
+                      Icons.error,
+                      size: 18,
                         ),
                       ),
                     ),
