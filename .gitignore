@@ -44,3 +44,22 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Sensitive files - DO NOT COMMIT
+# Keystore files
+*.jks
+*.keystore
+key.properties
+
+# Firebase configuration (contains API keys)
+android/app/google-services.json
+.firebaserc
+firebase.json
+
+# Client credentials
+CLIENT_CREDENTIALS.md
+FILES_TO_SEND_TO_CLIENT.md
+
+# Local properties (contains SDK paths)
+android/local.properties
+ios/Runner/GoogleService-Info.plist
